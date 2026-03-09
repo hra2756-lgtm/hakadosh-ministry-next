@@ -1,4 +1,16 @@
+import Link from 'next/link'
+import verses from '../data/kjv-nt.json'
+
+export const dynamic = 'force-dynamic'
+
+function getRandomVerse() {
+  const index = Math.floor(Math.random() * verses.length)
+  return verses[index]
+}
+
 export default function HomePage() {
+  const randomVerse = getRandomVerse()
+
   return (
     <section className="hero-section">
       <div className="hero-inner">
@@ -8,8 +20,6 @@ export default function HomePage() {
           className="hero-logo"
         />
 
-        <p className="hero-kicker">Jesus Christ • Truth • Salvation</p>
-
         <h1 className="hero-title">Hakadosh Ministry</h1>
 
         <p className="hero-subtitle">
@@ -17,21 +27,18 @@ export default function HomePage() {
         </p>
 
         <div className="hero-actions">
-          <a href="/gospel" className="hero-button hero-button-primary">
+          <Link href="/gospel" className="hero-button hero-button-primary">
             Read the Gospel
-          </a>
+          </Link>
 
-          <a href="/message" className="hero-button hero-button-secondary">
+          <Link href="/message" className="hero-button hero-button-secondary">
             Explore the Message
-          </a>
+          </Link>
         </div>
 
         <div className="hero-verse-box">
-          <p className="hero-verse">
-            “I am the light of the world. Whoever follows me will not walk in darkness,
-            but will have the light of life.”
-          </p>
-          <span className="hero-verse-ref">John 8:12</span>
+          <p className="hero-verse">“{randomVerse.text}”</p>
+          <span className="hero-verse-ref">{randomVerse.reference} (KJV)</span>
         </div>
       </div>
     </section>
