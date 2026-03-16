@@ -1,5 +1,6 @@
 import './globals.css'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata = {
   title: 'Hakadosh Ministry',
@@ -12,10 +13,13 @@ export default function RootLayout({ children }) {
       <body>
         <header className="header">
           <div className="logo-container">
-            <img
+            <Image
               src="/favicon.png"
               alt="Hakadosh Ministry Logo"
               className="logo"
+              width={80}
+              height={80}
+              priority
             />
           </div>
         </header>

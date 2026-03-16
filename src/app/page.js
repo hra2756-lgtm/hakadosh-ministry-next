@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import verses from '../data/kjv-nt.json'
 
 export const dynamic = 'force-dynamic'
@@ -14,10 +15,13 @@ export default function HomePage() {
   return (
     <section className="hero-section">
       <div className="hero-inner">
-        <img
+        <Image
           src="/favicon.png"
           alt="Hakadosh Ministry Logo"
           className="hero-logo"
+          width={140}
+          height={140}
+          priority
         />
 
         <h1 className="hero-title">Hakadosh Ministry</h1>
