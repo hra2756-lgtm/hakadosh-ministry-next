@@ -1,50 +1,49 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import verses from '../data/kjv-nt.json'
 
 export const dynamic = 'force-dynamic'
 
-function getRandomVerse() {
-  const index = Math.floor(Math.random() * verses.length)
+function getVerseOfTheDay() {
+  const today = new Date()
+  const dayNumber = Math.floor(today.getTime() / (1000 * 60 * 60 * 24))
+  const index = dayNumber % verses.length
   return verses[index]
 }
 
 export default function HomePage() {
-  const randomVerse = getRandomVerse()
+  const verseOfTheDay = getVerseOfTheDay()
 
   return (
-    <section className="hero-section">
-      <div className="hero-inner">
-        <Image
-          src="/favicon.png"
-          alt="Hakadosh Ministry Logo"
-          className="hero-logo"
-          width={140}
-          height={140}
-          priority
-        />
+    <>
+      {/* BUTTONS SECTION (moved up) */}
+      <div className="top-actions">
+        <Link href="/gospel" className="hero-button hero-button-primary">
+          Read the Gospel
+        </Link>
 
-        <h1 className="hero-title">Hakadosh Ministry</h1>
-
-        <p className="hero-subtitle">
-          A place for faith, truth, wisdom, and spiritual growth through Jesus Christ and the Gospel.
-        </p>
-
-        <div className="hero-actions">
-          <Link href="/gospel" className="hero-button hero-button-primary">
-            Read the Gospel
-          </Link>
-
-          <Link href="/message" className="hero-button hero-button-secondary">
-            Explore the Message
-          </Link>
-        </div>
-
-        <div className="hero-verse-box">
-          <p className="hero-verse">“{randomVerse.text}”</p>
-          <span className="hero-verse-ref">{randomVerse.reference} (KJV)</span>
-        </div>
+        <Link href="/message" className="hero-button hero-button-secondary">
+          Explore the Message
+        </Link>
       </div>
-    </section>
+
+      {/* HERO / VERSE SECTION */}
+      <section className="hero-section">
+        <div className="hero-inner">
+
+          <div className="hero-verse-box">
+            <p className="verse-label">Verse of the Day:</p>
+
+            <p className="hero-verse">
+              “{verseOfTheDay.text}”
+            </p>
+
+            <span className="hero-verse-ref">
+              {verseOfTheDay.reference} (KJV)
+            </span>
+          </div>
+
+        </div>
+      </section>
+    </>
   )
 }

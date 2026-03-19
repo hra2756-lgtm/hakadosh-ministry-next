@@ -12,15 +12,19 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <header className="header">
-          <div className="logo-container">
-            <Image
-              src="/favicon.png"
-              alt="Hakadosh Ministry Logo"
-              className="logo"
-              width={80}
-              height={80}
-              priority
-            />
+          <div className="header-top">
+            <h1 className="site-title">Hakadosh Ministry</h1>
+
+            <div className="logo-container">
+              <Image
+                src="/favicon.png"
+                alt="Hakadosh Ministry Logo"
+                className="logo"
+                width={80}
+                height={80}
+                priority
+              />
+            </div>
           </div>
         </header>
 
