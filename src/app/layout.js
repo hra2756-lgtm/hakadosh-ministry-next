@@ -33,6 +33,7 @@ export default function RootLayout({ children }) {
         <nav className="navbar">
           <Link href="/gospel">Gospel</Link>
           <Link href="/music">Music</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="/message">Message</Link>
           <Link href="/store">Store</Link>
           <Link href="/contact">Contact</Link>
