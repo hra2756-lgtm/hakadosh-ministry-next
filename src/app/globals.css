@@ -137,6 +137,23 @@ body{
   margin-bottom:42px;
 }
 
+.daily-verses{
+  max-width:1600px;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:28px;
+}
+
+.daily-verses .hero-verse-box{
+  width:100%;
+  min-width:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow-wrap:anywhere;
+}
+
 .hero-button{
   display:inline-block;
   padding:14px 26px;
@@ -212,6 +229,13 @@ body{
   letter-spacing:1px;
 }
 
+.verse-numbering-note{
+  margin-top:12px;
+  color:#c9c3b4;
+  font-size:0.85rem;
+  line-height:1.5;
+}
+
 /* TOP ACTIONS (buttons under gold line) */
 
 .top-actions{
@@ -275,6 +299,12 @@ body{
 /* RESPONSIVE */
 
 @media (max-width: 768px){
+  .daily-verses{
+    grid-template-columns:1fr;
+    gap:24px;
+    padding:10px 0;
+  }
+
   .header{
     padding:18px 20px 12px;
   }
