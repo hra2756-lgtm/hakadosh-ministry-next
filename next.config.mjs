@@ -42,12 +42,27 @@ const securityHeaders = [
   }
 ]
 
+// Allow only YouTube frames and thumbnails on the two gallery routes.
+const youtubeHeaders = securityHeaders.map(header => header.key === 'Content-Security-Policy'
+  ? { ...header, value: header.value
+      .replace("img-src 'self' data: blob:", "img-src 'self' data: blob: https://i.ytimg.com")
+      .concat('; frame-src https://www.youtube-nocookie.com') }
+  : header)
+
 const nextConfig = {
   async headers() {
     return [
       {
         source: '/:path*',
         headers: securityHeaders
+      },
+      {
+        source: '/youtube-spanish',
+        headers: youtubeHeaders
+      },
+      {
+        source: '/youtube-english',
+        headers: youtubeHeaders
       }
     ]
   }
