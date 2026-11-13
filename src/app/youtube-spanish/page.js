@@ -1,8 +1,8 @@
 import YouTubeGallery from '../components/youtube-gallery'
+import { getPageMetadata } from '../../lib/language'
 
-export const metadata = {
-  title: 'Youtube Spanish | Hakadosh Ministry',
-  description: 'El lugar donde puedes reconciliar tu relación con Cristo Jesús',
+export async function generateMetadata() {
+  return getPageMetadata('youtube-spanish')
 }
 
 export default async function SpanishYouTubePage({ searchParams }) {

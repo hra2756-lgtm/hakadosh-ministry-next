@@ -2,27 +2,9 @@ import Image from 'next/image'
 import { youtubeChannels } from '../../lib/youtube-channels.mjs'
 import { visibleCount } from '../../lib/youtube-data.mjs'
 import { getPlaylist } from '../../lib/youtube'
+import { getLanguage } from '../../lib/language'
 
-const labels = {
-  es: {
-    title: 'Youtube Spanish', subtitle: 'El lugar donde puedes reconciliar tu relación con Cristo Jesús',
-    videos: 'Videos completos', shorts: 'Shorts', latest: 'Más recientes primero',
-    channel: 'Visitar el canal', playlist: 'Ver playlist en YouTube', more: 'Mostrar más',
-    watch: 'Ver video', close: 'Cerrar reproductor', youtube: 'Ver en YouTube',
-    unavailable: 'No pudimos cargar los videos en este momento. Puedes verlos directamente en YouTube.',
-    empty: 'Todavía no hay videos públicos disponibles en esta playlist.',
-  },
-  en: {
-    title: 'Youtube English', subtitle: 'The place where you can reconcile your relationship with Jesus Christ',
-    videos: 'Full videos', shorts: 'Shorts', latest: 'Newest first',
-    channel: 'Visit the channel', playlist: 'View playlist on YouTube', more: 'Show more',
-    watch: 'Watch video', close: 'Close player', youtube: 'Watch on YouTube',
-    unavailable: 'We could not load the videos right now. You can watch them directly on YouTube.',
-    empty: 'There are no public videos available in this playlist yet.',
-  },
-}
-
-function VideoCard({ video, language, kind, text }) {
+function VideoCard({ video, language, contentLanguage, kind, text }) {
   const watchUrl = `https://www.youtube.com/watch?v=${video.id}`
   return (
     <article className={`youtube-card youtube-card-${kind}`}>
@@ -51,7 +33,7 @@ function VideoCard({ video, language, kind, text }) {
         </a>
       )}
       <div className="youtube-card-copy">
-        <h3>{video.title}</h3>
+        <h3 lang={contentLanguage}>{video.title}</h3>
         <time dateTime={video.publishedAt}>
           {new Intl.DateTimeFormat(language === 'es' ? 'es-MX' : 'en-US', {
             dateStyle: 'long', timeZone: 'UTC',
@@ -64,7 +46,8 @@ function VideoCard({ video, language, kind, text }) {
 }
 
 export default async function YouTubeGallery({ language, searchParams }) {
-  const text = labels[language]
+  const { language: uiLanguage, text: siteText } = await getLanguage()
+  const text = siteText.youtube
   const channel = youtubeChannels[language]
   const [videos, shorts] = await Promise.all([
     getPlaylist(channel.videos, channel.channelId), getPlaylist(channel.shorts, channel.channelId),
@@ -72,11 +55,11 @@ export default async function YouTubeGallery({ language, searchParams }) {
   const counts = { videos: visibleCount(searchParams.videos, videos.videos.length), shorts: visibleCount(searchParams.shorts, shorts.videos.length) }
   const path = language === 'es' ? '/youtube-spanish' : '/youtube-english'
   return (
-    <section className="youtube-shell" lang={language}>
+    <section className="youtube-shell" lang={uiLanguage}>
       <script src="/youtube-player.js" defer />
       <header className="youtube-intro">
         <span className="content-eyebrow">Hakadosh Ministry · YouTube</span>
-        <h1 className="content-title">{text.title}</h1>
+        <h1 className="content-title">{siteText.nav[path.slice(1)]}</h1>
         <p className="content-copy">{text.subtitle}</p>
         <a className="hero-button hero-button-secondary" href={`https://www.youtube.com/${channel.handle}`} target="_blank" rel="noopener noreferrer">
           {text.channel} ↗
@@ -92,7 +75,7 @@ export default async function YouTubeGallery({ language, searchParams }) {
                 <p>{text.latest}</p>
               </div>
               <div className="youtube-list">
-                {result.videos.slice(0, counts[kind]).map(video => <VideoCard key={video.id} video={video} language={language} kind={kind} text={text} />)}
+                {result.videos.slice(0, counts[kind]).map(video => <VideoCard key={video.id} video={video} language={uiLanguage} contentLanguage={language} kind={kind} text={text} />)}
               </div>
               {!result.videos.length && <p className="youtube-notice">{result.unavailable ? text.unavailable : text.empty}</p>}
               {counts[kind] < result.videos.length && (

@@ -1,8 +1,8 @@
 import YouTubeGallery from '../components/youtube-gallery'
+import { getPageMetadata } from '../../lib/language'
 
-export const metadata = {
-  title: 'Youtube English | Hakadosh Ministry',
-  description: 'The place where you can reconcile your relationship with Jesus Christ',
+export async function generateMetadata() {
+  return getPageMetadata('youtube-english')
 }
 
 export default async function EnglishYouTubePage({ searchParams }) {

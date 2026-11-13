@@ -2,10 +2,12 @@ import Link from 'next/link'
 import verses from '../data/kjv-nt.json'
 import { getVerseOfTheDay } from '../lib/verse-of-the-day'
 import { getSpanishVerse } from '../lib/spanish-verse'
+import { getLanguage } from '../lib/language'
 
 export const dynamic = 'force-dynamic'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { text } = await getLanguage()
   const verseOfTheDay = getVerseOfTheDay(verses)
   const spanishVerse = getSpanishVerse(verseOfTheDay)
 
@@ -13,11 +15,11 @@ export default function HomePage() {
     <>
       <div className="top-actions">
         <Link href="/gospel" className="hero-button hero-button-primary">
-          Read the Gospel
+          {text.home.gospel}
         </Link>
 
         <Link href="/message" className="hero-button hero-button-secondary">
-          Explore the Message
+          {text.home.message}
         </Link>
       </div>
 
