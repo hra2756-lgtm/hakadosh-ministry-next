@@ -13,7 +13,9 @@ export default function RootLayout({ children }) {
       <body>
         <header className="header">
           <div className="header-top">
-            <h1 className="site-title">Hakadosh Ministry</h1>
+            <h1 className="site-title">
+              <Link className="site-home-link" href="/">Hakadosh Ministry</Link>
+            </h1>
 
             <div className="logo-container">
               <Image
@@ -31,12 +33,14 @@ export default function RootLayout({ children }) {
         <div className="gold-border"></div>
 
         <nav className="navbar">
+          <Link href="/youtube-spanish">Youtube Spanish</Link>
           <Link href="/gospel">Gospel</Link>
           <Link href="/music">Music</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/message">Message</Link>
           <Link href="/store">Store</Link>
           <Link href="/contact">Contact</Link>
+          <Link href="/youtube-english">Youtube English</Link>
         </nav>
 
         <main className="page-content">

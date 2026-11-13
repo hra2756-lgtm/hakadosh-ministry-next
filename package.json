@@ -3,15 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next start",
     "lint": "eslint"
   },
   "dependencies": {
     "next": "^16.2.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.1"
+    }
   },
   "devDependencies": {
     "eslint": "^9",
