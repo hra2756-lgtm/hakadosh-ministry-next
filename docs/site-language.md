@@ -6,8 +6,9 @@ Español and displays the active choice. A first-party `site-language` cookie
 remembers that non-sensitive preference for a year (SameSite=Lax, Secure on HTTPS).
 Clearing cookies restores English. JavaScript is required to change the selection.
 
-The small external header script reloads the current URL after a selection, so
-the page, gallery pagination, and URL fragment are preserved. No translation
+The small external header script reloads the current URL after a selection on
+ordinary pages. On either YouTube gallery it navigates to the channel matching
+the selected language, resetting pagination to the newest uploads. No translation
 service, account, API key, or new dependency is used. The existing CSP is unchanged.
 Header menus support keyboard operation, Escape, and outside-click dismissal.
 
@@ -15,7 +16,9 @@ Header menus support keyboard operation, Escape, and outside-click dismissal.
 page copy, metadata, accessibility labels, dates, and gallery controls follow the
 selected language. Both daily-verse panels retain their original languages and
 texts. The ministry/platform names, Bible translation names, and published YouTube
-video titles are retained; choosing a language does not switch YouTube channels.
+video titles are retained. One YouTube navigation link opens the channel matching
+the current language. Both gallery URLs remain directly accessible and have
+translated external buttons to visit either channel on YouTube.
 
 Server components read the preference on each request. Personalized HTML must
 remain private/dynamic; never put a visitor's selected language in a shared cache.
