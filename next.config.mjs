@@ -49,6 +49,13 @@ const youtubeHeaders = securityHeaders.map(header => header.key === 'Content-Sec
       .concat('; frame-src https://www.youtube-nocookie.com') }
   : header)
 
+// Turnstile is allowed only on the contact page; inline scripts remain blocked.
+const contactHeaders = securityHeaders.map(header => header.key === 'Content-Security-Policy'
+  ? { ...header, value: header.value
+      .replace("script-src 'self'", "script-src 'self' https://challenges.cloudflare.com")
+      .concat('; frame-src https://challenges.cloudflare.com') }
+  : header)
+
 const nextConfig = {
   async headers() {
     return [
@@ -63,6 +70,10 @@ const nextConfig = {
       {
         source: '/youtube-english',
         headers: youtubeHeaders
+      },
+      {
+        source: '/contact',
+        headers: contactHeaders
       }
     ]
   }

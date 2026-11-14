@@ -10,6 +10,10 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const { language, text } = await getLanguage()
+  const navigation = [
+    [language === 'es' ? 'youtube-spanish' : 'youtube-english', 'YouTube'],
+    ...Object.entries(text.nav).filter(([path]) => !path.startsWith('youtube-')),
+  ]
   return (
     <html lang={language}>
       <body>
@@ -29,7 +33,7 @@ export default async function RootLayout({ children }) {
               </summary>
               <nav className="site-navigation" id="site-navigation" aria-label={text.mainNavigation}>
                 <p className="site-navigation-label">{text.explore}</p>
-                {Object.entries(text.nav).map(([path, label]) => <Link href={`/${path}`} key={path}>{label}</Link>)}
+                {navigation.map(([path, label]) => <Link href={`/${path}`} key={path}>{label}</Link>)}
               </nav>
             </details>
             <h1 className="site-title">

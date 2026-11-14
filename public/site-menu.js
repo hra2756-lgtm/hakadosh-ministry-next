@@ -25,7 +25,10 @@
       option.addEventListener('click', () => {
         const language = option.dataset.language
         if (language !== 'en' && language !== 'es') return
-        if (language === document.documentElement.lang) {
+        const path = window.location.pathname.replace(/\/$/, '')
+        const isYouTube = path === '/youtube-english' || path === '/youtube-spanish'
+        const channelPath = language === 'es' ? '/youtube-spanish' : '/youtube-english'
+        if (language === document.documentElement.lang && (!isYouTube || path === channelPath)) {
           menu.open = false
           toggle.focus()
           return
@@ -33,8 +36,9 @@
         // Only a non-sensitive language preference is stored; no translation service.
         const secure = window.location.protocol === 'https:' ? '; Secure' : ''
         document.cookie = `site-language=${language}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`
-        // Request freshly translated HTML while preserving the current page and query.
-        window.location.reload()
+        // Start the matching channel at its newest uploads when switching galleries.
+        if (isYouTube && path !== channelPath) window.location.assign(channelPath)
+        else window.location.reload()
       })
     }
   }

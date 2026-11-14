@@ -61,9 +61,13 @@ export default async function YouTubeGallery({ language, searchParams }) {
         <span className="content-eyebrow">Hakadosh Ministry · YouTube</span>
         <h1 className="content-title">{siteText.nav[path.slice(1)]}</h1>
         <p className="content-copy">{text.subtitle}</p>
-        <a className="hero-button hero-button-secondary" href={`https://www.youtube.com/${channel.handle}`} target="_blank" rel="noopener noreferrer">
-          {text.channel} ↗
-        </a>
+        <div className="youtube-channel-actions">
+          {['en', 'es'].map(code => (
+            <a key={code} className="hero-button hero-button-secondary" href={`https://www.youtube.com/${youtubeChannels[code].handle}`} target="_blank" rel="noopener noreferrer">
+              {text.channels[code]} ↗
+            </a>
+          ))}
+        </div>
       </header>
       <div className="youtube-columns">
         {[['videos', videos], ['shorts', shorts]].map(([kind, result]) => {
