@@ -117,6 +117,12 @@ function respond(data, status = 200, headers = {}) {
   return Response.json(data, { status, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie', ...headers } })
 }
 
+function unavailable(stage) {
+  // Only fixed, code-defined stage names reach logs; never include request/provider data.
+  console.error(`[blog-likes] unavailable: ${stage}`)
+  return respond({ code: 'unavailable' }, 503)
+}
+
 // Only this fixed operation is exposed. No arbitrary Redis commands or client-supplied totals.
 export async function handleLikes(request, slug, { env = process.env, lookupPost, command: suppliedCommand } = {}) {
   const writing = request.method === 'POST'
@@ -124,7 +130,7 @@ export async function handleLikes(request, slug, { env = process.env, lookupPost
   if (!validSlug(slug) || !allowedRequest(request, env, writing)) return respond({ code: 'invalid' }, 403)
   if (writing && request.headers.get('content-type')?.split(';')[0].trim() !== 'application/json') return respond({ code: 'invalid' }, 415)
   const config = likesConfig(env)
-  if (!config) return respond({ code: 'unavailable' }, 503)
+  if (!config) return unavailable('configuration')
   let visitor = readVisitor(request, config)
   if (writing && !visitor) return respond({ code: 'refresh' }, 403)
   let desired
@@ -134,23 +140,26 @@ export async function handleLikes(request, slug, { env = process.env, lookupPost
   }
   // Trust this header only when running on Vercel. Local requests share a local bucket.
   const ip = env.VERCEL ? request.headers.get('x-vercel-forwarded-for')?.split(',')[0].trim() : 'local'
-  if (env.VERCEL && !isIP(ip || '')) return respond({ code: 'unavailable' }, 503)
+  if (env.VERCEL && !isIP(ip || '')) return unavailable('client-ip')
   const command = suppliedCommand || (args => redisCommand(config, args))
+  let stage = 'rate-storage'
   try {
     const bucket = `${config.prefix}:rate:${writing ? 'write' : 'read'}:${mac(config, `network:${ip}`)}`
     if (await command(['EVAL', RATE_SCRIPT, 1, bucket, writing ? 30 : 120]) !== 1) return respond({ code: 'limited' }, 429, { 'Retry-After': '60' })
+    stage = 'post-lookup'
     const post = await lookupPost(slug)
-    if (!post.ok) return respond({ code: 'unavailable' }, 503)
+    if (!post.ok) return unavailable(stage)
     if (!post.id || typeof post.id !== 'string' || post.id.includes('.')) return respond({ code: 'missing' }, 404)
     const headers = {}
     if (!visitor) {
       visitor = randomUUID()
       headers['Set-Cookie'] = `${LIKE_COOKIE}=${makeVisitorCookie(config, visitor)}; Path=/; Max-Age=${YEAR}; HttpOnly; SameSite=Lax${new URL(request.url).protocol === 'https:' ? '; Secure' : ''}`
     }
+    stage = 'likes-storage'
     const result = await changeLike(config, post.id, visitor, writing ? (desired ? 'like' : 'unlike') : 'read', command)
     return respond(result, 200, headers)
   } catch {
     // Never log provider responses, credentials, raw IPs or cookie values.
-    return respond({ code: 'unavailable' }, 503)
+    return unavailable(stage)
   }
 }

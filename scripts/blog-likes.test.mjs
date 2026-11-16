@@ -130,7 +130,8 @@ test('Vercel rate buckets use the platform IP, never the visitor cookie', async 
   assert.ok(!JSON.stringify(calls).includes('192.0.2.1'))
 })
 
-test('provider failures expose no credentials, and redirecting credentials is forbidden', async () => {
+test('provider failures expose no credentials, and redirecting credentials is forbidden', async t => {
+  const log = t.mock.method(console, 'error', () => {})
   await assert.rejects(redisCommand(config, ['PING'], async (_url, options) => {
     assert.equal(options.redirect, 'error')
     assert.equal(options.cache, 'no-store')
@@ -139,4 +140,27 @@ test('provider failures expose no credentials, and redirecting credentials is fo
   const response = await handleLikes(request(), 'no-milk-today', { env, lookupPost, command: async () => { throw new Error(env.UPSTASH_REDIS_REST_TOKEN) } })
   assert.equal(response.status, 503)
   assert.deepEqual(await response.json(), { code: 'unavailable' })
+  assert.deepEqual(log.mock.calls.map(call => call.arguments), [['[blog-likes] unavailable: rate-storage']])
+})
+
+test('failure diagnostics identify stages without logging request or provider data', async t => {
+  const log = t.mock.method(console, 'error', () => {})
+  const productionEnv = { ...env, VERCEL: '1', VERCEL_ENV: 'production', SANITY_DATASET: 'production' }
+  const responses = [
+    await handleLikes(request(), 'no-milk-today', { env: {}, lookupPost }),
+    await handleLikes(new Request('https://www.hakadoshministry.com/api/blog/no-milk-today/likes'), 'no-milk-today', { env: productionEnv, lookupPost }),
+    await handleLikes(request(), 'no-milk-today', { env, command: async () => 1, lookupPost: async () => ({ ok: false }) }),
+    await handleLikes(request(), 'no-milk-today', { env, lookupPost, command: async args => {
+      if (args[1] === RATE_SCRIPT) return 1
+      throw new Error(`sensitive-provider-data ${env.UPSTASH_REDIS_REST_TOKEN}`)
+    } }),
+  ]
+  for (const response of responses) {
+    assert.equal(response.status, 503)
+    assert.deepEqual(await response.json(), { code: 'unavailable' })
+  }
+  assert.deepEqual(log.mock.calls.map(call => call.arguments), [
+    ['[blog-likes] unavailable: configuration'], ['[blog-likes] unavailable: client-ip'],
+    ['[blog-likes] unavailable: post-lookup'], ['[blog-likes] unavailable: likes-storage'],
+  ])
 })
