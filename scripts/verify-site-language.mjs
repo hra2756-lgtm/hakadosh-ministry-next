@@ -26,7 +26,7 @@ async function page(path, language) {
 
 const home = {}
 for (const language of ['en', 'es']) {
-  for (const route of ['/', ...Object.keys(translations[language].nav).map(key => `/${key}`)]) {
+  for (const route of ['/', ...Object.keys(translations[language].nav).filter(key => key !== 'home').map(key => `/${key}`)]) {
     const { html, cache } = await page(route, language)
     assert.ok(html.includes(`<html lang="${language}"`), `Wrong document language: ${route}`)
     assert.ok(html.includes(`>${translations[language].selectedLanguage}</span>`), 'Wrong selected-language marker')
@@ -36,11 +36,14 @@ for (const language of ['en', 'es']) {
     const youtubeLinks = [...navigation.matchAll(/href="(\/youtube-[^"]+)"/g)]
     assert.equal(youtubeLinks.length, 1, 'Show exactly one YouTube menu entry')
     assert.equal(youtubeLinks[0][1], language === 'es' ? '/youtube-spanish' : '/youtube-english')
-    assert.ok(navigation.includes('>YouTube</a>'), 'Use the single YouTube menu label')
-    for (const [path, label] of Object.entries(translations[language].nav)) {
-      if (!path.startsWith('youtube-')) assert.ok(navigation.includes(label), `Missing translated menu: ${label}`)
-    }
-    assert.ok(navigation.indexOf('href="/blog"') < navigation.indexOf('href="/contact"') && navigation.indexOf('href="/contact"') < navigation.indexOf('href="/message"'), 'Connect with Us belongs after Blog')
+    const links = [...navigation.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+      .map(match => ({ href: match[1], label: match[2].replace(/<[^>]+>/g, '') }))
+    assert.deepEqual(links, [
+      { href: '/', label: translations[language].nav.home },
+      { href: language === 'es' ? '/youtube-spanish' : '/youtube-english', label: 'YouTube' },
+      ...['blog', 'music', 'gospel', 'store', 'contact'].map(path => ({ href: `/${path}`, label: translations[language].nav[path] })),
+    ], 'Menu destinations, order and translated labels must match')
+    assert.equal((navigation.match(/class="site-navigation-icon"/g) || []).length, 7, 'Each menu entry has an icon')
     if (route === '/contact') {
       assert.ok(html.includes(translations[language].pages.contact.title), 'Wrong welcome heading')
       assert.ok(html.includes(translations[language].contact.formTitle), 'Wrong form language')
