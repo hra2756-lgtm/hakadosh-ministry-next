@@ -6,7 +6,12 @@
     "dev": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next dev",
     "build": "next build",
     "start": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "studio": "npm --prefix studio run dev",
+    "studio:build": "npm --prefix studio run build",
+    "backup:blog": "node scripts/backup-blog.mjs",
+    "test:backup": "node --test scripts/blog-backup.test.mjs",
+    "test:blog": "node --test scripts/blog.test.mjs scripts/blog-likes.test.mjs"
   },
   "dependencies": {
     "next": "^16.2.0",

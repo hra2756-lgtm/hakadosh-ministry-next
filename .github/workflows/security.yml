@@ -35,5 +35,26 @@ jobs:
       - name: Validate contact form protections
         run: node --test scripts/contact.test.mjs
 
+      - name: Validate blog read protections
+        run: npm run test:blog
+
       - name: Run security audit
         run: npm audit --audit-level=moderate
+
+  studio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+      - run: npm ci
+        working-directory: studio
+      - name: Validate backup archives
+        run: npm run test:backup
+      - run: npm run build
+        working-directory: studio
+      - run: npm audit --audit-level=moderate
+        working-directory: studio
