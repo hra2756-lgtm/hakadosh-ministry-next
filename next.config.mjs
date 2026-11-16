@@ -56,6 +56,11 @@ const contactHeaders = securityHeaders.map(header => header.key === 'Content-Sec
       .concat('; frame-src https://challenges.cloudflare.com') }
   : header)
 
+// Blog images are fetched from this project's CDN path only. No extra script origins.
+const blogHeaders = securityHeaders.map(header => header.key === 'Content-Security-Policy'
+  ? { ...header, value: header.value.replace("img-src 'self' data: blob:", "img-src 'self' data: blob: https://cdn.sanity.io/images/2a3jhsqe/") }
+  : header)
+
 const nextConfig = {
   async headers() {
     return [
@@ -74,6 +79,10 @@ const nextConfig = {
       {
         source: '/contact',
         headers: contactHeaders
+      },
+      {
+        source: '/blog/:path*',
+        headers: blogHeaders
       }
     ]
   }

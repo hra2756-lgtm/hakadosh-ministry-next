@@ -7,7 +7,7 @@ const args = process.argv.slice(2)
 if (!args.length) throw new Error('Supply the Node script to launch')
 
 let child
-if (process.platform === 'win32' && ['YOUTUBE_API_KEY', 'RESEND_API_KEY', 'TURNSTILE_SECRET_KEY', 'TURNSTILE_SITE_KEY'].some(key => !process.env[key])) {
+if (process.platform === 'win32' && ['YOUTUBE_API_KEY', 'RESEND_API_KEY', 'TURNSTILE_SECRET_KEY', 'TURNSTILE_SITE_KEY', 'UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'].some(key => !process.env[key])) {
   const source = readFileSync(path.join(__dirname, 'with-youtube-key.ps1'), 'utf8')
   child = spawn('powershell.exe', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', source], {
     stdio: 'inherit',

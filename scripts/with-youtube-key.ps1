@@ -30,7 +30,9 @@ $namedCredentials = @(
     @{ Target = 'HakadoshMinistry/YouTube'; Variable = 'YOUTUBE_API_KEY'; Required = $true },
     @{ Target = 'HakadoshMinistry/Resend'; Variable = 'RESEND_API_KEY'; Required = $false },
     @{ Target = 'HakadoshMinistry/TurnstileSecret'; Variable = 'TURNSTILE_SECRET_KEY'; Required = $false },
-    @{ Target = 'HakadoshMinistry/TurnstileSite'; Variable = 'TURNSTILE_SITE_KEY'; Required = $false }
+    @{ Target = 'HakadoshMinistry/TurnstileSite'; Variable = 'TURNSTILE_SITE_KEY'; Required = $false },
+    @{ Target = 'HakadoshMinistry/UpstashUrl'; Variable = 'UPSTASH_REDIS_REST_URL'; Required = $false },
+    @{ Target = 'HakadoshMinistry/UpstashToken'; Variable = 'UPSTASH_REDIS_REST_TOKEN'; Required = $false }
 )
 foreach ($entry in $namedCredentials) {
     if ([Environment]::GetEnvironmentVariable($entry.Variable, 'Process')) { continue }

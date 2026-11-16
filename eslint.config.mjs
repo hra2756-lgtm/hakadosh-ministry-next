@@ -10,6 +10,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "studio/node_modules/**",
+    "studio/dist/**",
+    "studio/.sanity/**",
+    "backups/**",
   ]),
 ]);
 

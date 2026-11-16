@@ -2,6 +2,7 @@ import './globals.css'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getLanguage } from '../lib/language'
+import { NavigationIcon } from './components/navigation-icon'
 
 export async function generateMetadata() {
   const { text } = await getLanguage()
@@ -11,8 +12,9 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }) {
   const { language, text } = await getLanguage()
   const navigation = [
+    ['', text.nav.home],
     [language === 'es' ? 'youtube-spanish' : 'youtube-english', 'YouTube'],
-    ...Object.entries(text.nav).filter(([path]) => !path.startsWith('youtube-')),
+    ...['blog', 'music', 'gospel', 'store', 'contact'].map(path => [path, text.nav[path]]),
   ]
   return (
     <html lang={language}>
@@ -33,7 +35,7 @@ export default async function RootLayout({ children }) {
               </summary>
               <nav className="site-navigation" id="site-navigation" aria-label={text.mainNavigation}>
                 <p className="site-navigation-label">{text.explore}</p>
-                {navigation.map(([path, label]) => <Link href={`/${path}`} key={path}>{label}</Link>)}
+                {navigation.map(([path, label]) => <Link href={`/${path}`} key={path}><NavigationIcon path={path} /><span>{label}</span></Link>)}
               </nav>
             </details>
             <h1 className="site-title">

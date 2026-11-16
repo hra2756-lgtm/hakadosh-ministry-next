@@ -8,7 +8,7 @@ export const translations = {
     logo: 'Hakadosh Ministry Logo', languageMenu: 'Choose language', selectedLanguage: 'English',
     languageOptions: { en: 'English', es: 'Español' },
     languageHelp: 'Enable JavaScript to change the website language.',
-    nav: { 'youtube-spanish': 'Youtube Spanish', gospel: 'Gospel', music: 'Music', blog: 'Blog', contact: 'Connect with Us', message: 'Message', store: 'Store', 'youtube-english': 'Youtube English' },
+    nav: { home: 'Home', 'youtube-spanish': 'Youtube Spanish', gospel: 'Gospel', music: 'Music', blog: 'Blog', contact: 'Connect With Us', message: 'Message', store: 'Store', 'youtube-english': 'Youtube English' },
     home: { gospel: 'Read the Gospel', message: 'Explore the Message' },
     pages: {
       gospel: {
@@ -22,9 +22,9 @@ export const translations = {
         body: 'The Music page is now in place. When you are ready, we can add songs, albums, embedded audio, lyrics, streaming links, or a custom layout for releases.',
       },
       blog: {
-        title: 'This page is ready for your blog posts.',
-        description: 'A placeholder page for the Blog section of Hakadosh Ministry.',
-        body: 'The Blog page is now connected to the navigation. Later, we can turn it into a space for ministry updates, teachings, devotionals, announcements, and article archives.',
+        title: 'Words of Wisdom',
+        description: 'Revelations on faith, prayer, Scripture, and walking with Jesus Christ.',
+        body: 'A place to pause, reflect on Scripture, and draw closer to Jesus Christ.',
       },
       message: {
         title: 'This page is ready for your ministry message.',
@@ -79,7 +79,7 @@ export const translations = {
     logo: 'Logo de Hakadosh Ministry', languageMenu: 'Elegir idioma', selectedLanguage: 'Español',
     languageOptions: { en: 'English', es: 'Español' },
     languageHelp: 'Activa JavaScript para cambiar el idioma del sitio.',
-    nav: { 'youtube-spanish': 'YouTube en español', gospel: 'Evangelio', music: 'Música', blog: 'Blog', contact: 'Conéctate con nosotros', message: 'Mensaje', store: 'Tienda', 'youtube-english': 'YouTube en inglés' },
+    nav: { home: 'Inicio', 'youtube-spanish': 'YouTube en español', gospel: 'Evangelio', music: 'Música', blog: 'Blog', contact: 'Conéctate con nosotros', message: 'Mensaje', store: 'Tienda', 'youtube-english': 'YouTube en inglés' },
     home: { gospel: 'Lee el Evangelio', message: 'Explora el Mensaje' },
     pages: {
       gospel: {
@@ -93,9 +93,9 @@ export const translations = {
         body: 'La página de Música ya está disponible. Cuando estés listo, podremos añadir canciones, álbumes, reproductores de audio, letras, enlaces a plataformas musicales o un diseño personalizado para los lanzamientos.',
       },
       blog: {
-        title: 'Esta página está lista para las publicaciones de tu blog.',
-        description: 'Página de la sección del blog de Hakadosh Ministry, en preparación.',
-        body: 'La página del Blog ya está conectada al menú de navegación. Más adelante podremos convertirla en un espacio para novedades del ministerio, enseñanzas, devocionales, anuncios y un archivo de artículos.',
+        title: 'Palabras de sabiduría',
+        description: 'Revelaciones sobre la fe, la oración, las Escrituras y el caminar con Cristo Jesús.',
+        body: 'Un lugar para detenerte, reflexionar en las Escrituras y acercarte a Cristo Jesús.',
       },
       message: {
         title: 'Esta página está lista para el mensaje de tu ministerio.',
