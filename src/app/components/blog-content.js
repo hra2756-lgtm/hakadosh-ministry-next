@@ -16,6 +16,7 @@ function spans(block) {
     for (const mark of span.marks || []) {
       if (mark === 'strong') node = <strong>{node}</strong>
       else if (mark === 'em') node = <em>{node}</em>
+      else if (mark === 'inlineQuote') node = <q className="blog-inline-quote">{node}</q>
       else {
         const definition = block.markDefs?.find(item => item._key === mark && item._type === 'link')
         const href = safeHttpsUrl(definition?.href)
