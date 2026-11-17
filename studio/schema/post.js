@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { InlineQuote, InlineQuoteIcon } from '../components/inline-quote.js'
 
 const localized = (name, title, type, extra = {}) => defineField({
   name, title, type: 'object',
@@ -33,11 +34,15 @@ export const post = defineType({
     }),
     localized('excerpt', 'Short introduction / Introducción breve', 'text', { rows: 3, validation: rule => rule.max(300) }),
     localized('body', 'Revelation / Revelación', 'array', {
+      description: 'Select words and use Inline Quote for a short quotation. Quote / Scripture styles a whole paragraph. / Selecciona palabras y usa Cita en línea para una cita breve. Quote / Scripture aplica a todo el párrafo.',
       of: [{ type: 'block', styles: [
         { title: 'Paragraph', value: 'normal' }, { title: 'Heading', value: 'h2' },
         { title: 'Subheading', value: 'h3' }, { title: 'Quote / Scripture', value: 'blockquote' },
       ], marks: {
-        decorators: [{ title: 'Bold', value: 'strong' }, { title: 'Italic', value: 'em' }],
+        decorators: [
+          { title: 'Bold', value: 'strong' }, { title: 'Italic', value: 'em' },
+          { title: 'Inline Quote / Cita en línea', value: 'inlineQuote', icon: InlineQuoteIcon, component: InlineQuote },
+        ],
         annotations: [{ name: 'link', type: 'object', title: 'Link', fields: [
           { name: 'href', type: 'url', title: 'URL', validation: rule => rule.required().uri({ scheme: ['https'] }) },
         ] }],
