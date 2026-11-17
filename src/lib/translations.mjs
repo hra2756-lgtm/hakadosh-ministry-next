@@ -12,8 +12,8 @@ export const translations = {
     home: { gospel: 'Read the Gospel', message: 'Explore the Message' },
     pages: {
       gospel: {
-        title: 'This page is ready for your Gospel content.',
-        description: 'A placeholder page for the Gospel section of Hakadosh Ministry.',
+        title: 'Abide in His Word',
+        description: 'Read and search the complete Bible in English (KJV) and Spanish (Reina-Valera 1909). Explore books, chapters, and verses.',
         body: 'We have created the Gospel page and connected it to the navigation. Later, we can add scripture, teaching, calls to action, and any design direction you want here.',
       },
       music: {
@@ -83,8 +83,8 @@ export const translations = {
     home: { gospel: 'Lee el Evangelio', message: 'Explora el Mensaje' },
     pages: {
       gospel: {
-        title: 'Esta página está lista para el contenido del Evangelio.',
-        description: 'Página de la sección del Evangelio de Hakadosh Ministry, en preparación.',
+        title: 'Permanece en su Palabra',
+        description: 'Lee y busca en la Biblia completa en inglés (KJV) y español (Reina-Valera 1909). Explora libros, capítulos y versículos.',
         body: 'Hemos creado la página del Evangelio y la hemos conectado al menú de navegación. Más adelante podremos añadir pasajes bíblicos, enseñanzas, invitaciones a participar y el diseño que desees.',
       },
       music: {

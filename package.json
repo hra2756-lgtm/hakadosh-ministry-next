@@ -11,7 +11,8 @@
     "studio:build": "npm --prefix studio run build",
     "backup:blog": "node scripts/backup-blog.mjs",
     "test:backup": "node --test scripts/blog-backup.test.mjs",
-    "test:blog": "node --test scripts/blog.test.mjs scripts/blog-likes.test.mjs"
+    "test:blog": "node --test scripts/blog.test.mjs scripts/blog-likes.test.mjs",
+    "test:bible": "node --test scripts/bible.test.mjs"
   },
   "dependencies": {
     "next": "^16.2.0",

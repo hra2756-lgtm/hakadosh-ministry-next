@@ -1,15 +1,12 @@
 import Link from 'next/link'
-import verses from '../data/kjv-nt.json'
-import { getVerseOfTheDay } from '../lib/verse-of-the-day'
-import { getSpanishVerse } from '../lib/spanish-verse'
+import { getDailyPassage, passageHref } from '../lib/bible.mjs'
 import { getLanguage } from '../lib/language'
 
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const { text } = await getLanguage()
-  const verseOfTheDay = getVerseOfTheDay(verses)
-  const spanishVerse = getSpanishVerse(verseOfTheDay)
+  const { en: verseOfTheDay, es: spanishVerse } = getDailyPassage()
 
   return (
     <>
@@ -25,7 +22,7 @@ export default async function HomePage() {
 
       <section className="hero-section">
         <div className="hero-inner daily-verses">
-          <section className="hero-verse-box" lang="es" aria-labelledby="spanish-verse-title">
+          <a href={passageHref(spanishVerse.book, spanishVerse.chapter, spanishVerse.verse, 'es')} className="hero-verse-box daily-verse-link" lang="es" aria-labelledby="spanish-verse-title">
             <h2 className="verse-label" id="spanish-verse-title">Verso del Día:</h2>
 
             <p className="hero-verse">
@@ -35,14 +32,10 @@ export default async function HomePage() {
             <span className="hero-verse-ref">
               {spanishVerse.reference} (RV1909)
             </span>
-            {spanishVerse.kjvReference && (
-              <p className="verse-numbering-note">
-                Mismo pasaje que {spanishVerse.kjvReference} en KJV.
-              </p>
-            )}
-          </section>
+            <span className="daily-verse-read">Leer el pasaje →</span>
+          </a>
 
-          <section className="hero-verse-box" lang="en" aria-labelledby="english-verse-title">
+          <a href={passageHref(verseOfTheDay.book, verseOfTheDay.chapter, verseOfTheDay.verse, 'en')} className="hero-verse-box daily-verse-link" lang="en" aria-labelledby="english-verse-title">
             <h2 className="verse-label" id="english-verse-title">Verse of the Day:</h2>
 
             <p className="hero-verse">
@@ -52,9 +45,11 @@ export default async function HomePage() {
             <span className="hero-verse-ref">
               {verseOfTheDay.reference} (KJV)
             </span>
-          </section>
+            <span className="daily-verse-read">Read the passage →</span>
+          </a>
         </div>
       </section>
+      <p className="daily-bible-credit">KJV · Reina-Valera 1909 · <a href="/gospel">Bible editions / Ediciones bíblicas</a></p>
     </>
   )
 }
