@@ -1,5 +1,5 @@
 import { getLanguage, getPageMetadata } from '../../lib/language'
-import { bibles, chapterHref, findBook, reference, searchBible } from '../../lib/bible.mjs'
+import { bibles, chapterHref, findBook, reference, searchBible, readablePassageQuery, MAX_BIBLE_QUERY_LENGTH } from '../../lib/bible.mjs'
 import { gospelText } from '../../lib/gospel-translations.mjs'
 import './gospel.css'
 
@@ -39,7 +39,7 @@ export default async function GospelPage({ searchParams }) {
       <form action="/gospel" method="get" className="bible-search-form" role="search">
         <label htmlFor="bible-query">{t.search}</label>
         <div className="bible-search-line">
-          <input id="bible-query" name="q" type="search" required maxLength={240} defaultValue={result.query} placeholder={t.placeholder} aria-describedby="bible-search-help" />
+          <input id="bible-query" name="q" type="search" required maxLength={MAX_BIBLE_QUERY_LENGTH} defaultValue={readablePassageQuery(result)} placeholder={t.placeholder} aria-describedby="bible-search-help" />
           <button className="hero-button hero-button-primary" type="submit">{t.submit} <span aria-hidden="true">→</span></button>
         </div><p id="bible-search-help">{t.help}</p>
       </form>

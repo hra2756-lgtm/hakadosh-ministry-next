@@ -77,3 +77,29 @@
 body:has(.gospel-page)>.gold-border{height:3px;}
 @media(max-width:800px){.gospel-page{padding:36px 18px 50px;}.bible-layout{grid-template-columns:1fr;}.bible-library{order:2;}.bible-book-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:360px;}.bible-reading-panel{padding:24px;}.bible-search-panel{padding:20px;}}
 @media(max-width:520px){.bible-search-line{flex-direction:column;}.bible-browse-form{flex-wrap:wrap;gap:12px;}.bible-browse-form>div:first-child{flex:1;min-width:150px;}.bible-browse-form input{width:80px;}.bible-browse-form>button{width:100%;}.bible-reading-panel{padding:20px 18px;}.bible-passages{font-size:1.1rem;}.bible-welcome{padding:36px 20px;}.bible-recommendation{padding:24px 18px;}.bible-result-heading{display:block;}.bible-result-heading p{margin-top:8px;}}
+
+/* Navy navigation and parchment Scripture reader. */
+.bible-search-panel,.bible-recommendation,.bible-notice{background:var(--ministry-navy);}
+.bible-library{background:var(--ministry-navy-deep);}
+.bible-search-panel input,.bible-search-panel select{background:var(--ministry-input);color-scheme:dark;}
+.bible-search-panel input::placeholder{color:#bec9d6;}
+.bible-book-list{scrollbar-color:var(--ministry-border) var(--ministry-navy-deep);}
+.bible-book-list a{color:#e1e4e4;}
+.bible-book-list a span,.bible-library summary span{color:#bec9d6;}
+.bible-book-list a:hover{background:var(--ministry-navy-hover);}
+.bible-book-list a[aria-current]{background:var(--ministry-gold);color:var(--ministry-ink);}
+.bible-book-list a[aria-current] span{color:var(--ministry-ink);}
+.bible-reading-panel,.bible-welcome{background:var(--ministry-paper);color:var(--ministry-ink);}
+.bible-chapter-heading h3,.bible-welcome h3{color:var(--ministry-ink);}
+.bible-chapter-heading>p,.bible-highlight-tools p,.bible-welcome p,.bible-verse-number{color:var(--ministry-paper-muted);}
+.bible-chapter-heading summary,.bible-chapter-navigation a{color:var(--ministry-paper-link);}
+.bible-chapter-grid a{color:var(--ministry-ink);border-color:var(--ministry-border);}
+.bible-chapter-grid a[aria-current],.bible-chapter-grid a:hover{background:var(--ministry-navy);color:var(--ministry-gold);}
+.bible-highlight-tools button{background:var(--ministry-navy);color:var(--ministry-gold);border-color:var(--ministry-border);}
+.bible-highlight-tools button:hover{background:var(--ministry-navy-hover);}
+.bible-verse:target{background:#e8dfc9;outline-color:#947422;}
+.bible-verse mark{background:#eed77e;color:var(--ministry-ink);}
+.bible-passages ::selection{background:#e6c76b;color:var(--ministry-ink);}
+.bible-reading-panel :is(a,button,summary):focus-visible,.bible-welcome a:focus-visible{outline-color:var(--ministry-paper-link);}
+.gospel-page :is(.bible-library,.bible-welcome,.bible-reading-panel,.bible-recommendation,.bible-notice){border-color:var(--ministry-border);}
+.gospel-page :is(.bible-browse-form,.bible-library summary,.bible-chapter-heading,.bible-chapter-navigation,.bible-license){border-color:var(--ministry-border);}

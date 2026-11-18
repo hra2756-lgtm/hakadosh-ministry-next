@@ -61,7 +61,7 @@ export default async function Page() {
           <label>{t.message}<textarea name="message" rows={6} minLength={10} maxLength={5000} required aria-describedby="message-hint" /></label>
           <p className="contact-hint" id="message-hint">{t.messageHint}</p>
           <div className="contact-trap" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
-          {config.ready && <div className="cf-turnstile" data-sitekey={config.siteKey} data-action="contact" data-theme="dark" data-language={language} data-size="flexible" />}
+          {config.ready && <div className="cf-turnstile" data-sitekey={config.siteKey} data-action="contact" data-theme="dark" data-language={language} data-size="compact" />}
           <p className="contact-privacy">{t.privacy}</p>
           <button className="hero-button hero-button-primary contact-submit" type="submit" disabled>{t.send} <span aria-hidden="true">↗</span></button>
           <p id="contact-status" className="contact-status" role="status" aria-live="polite" tabIndex={-1}>{config.ready ? '' : t.statuses.unavailable}</p>

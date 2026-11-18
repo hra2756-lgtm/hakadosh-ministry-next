@@ -4,14 +4,20 @@ import { getVerseOfTheDay } from './verse-of-the-day.js'
 import { spanishDailyReference } from './bible-alignment.mjs'
 
 export const bibles = { en: english, es: spanish }
+export const MAX_BIBLE_QUERY_LENGTH = 1000
 export const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[.]/g, '').replace(/\s+/g, ' ').trim()
 const compact = value => normalize(value).replace(/[–—]/g, '-').replace(/\s/g, '')
 const aliases = new Map()
-for (const books of Object.values(bibles)) for (const book of books) {
-  for (const alias of [book.id, book.name, book.abbr, book.name.replace(/^San /, '')]) aliases.set(compact(alias), book.id)
+export const bibleBookNames = new Set()
+function addAlias(alias, id) {
+  bibleBookNames.add(alias)
+  aliases.set(compact(alias), id)
 }
-aliases.set('salmo', 'PSA')
-for (const [alias, id] of Object.entries({ psalm: 'PSA', salmos: 'PSA', 'song of songs': 'SNG', 'cantar de los cantares': 'SNG', 'cantar de cantares': 'SNG', 'cantares': 'SNG', john: 'JHN', jn: 'JHN', '1 cor': '1CO', '2 cor': '2CO', '1 thes': '1TH', '2 thes': '2TH', '1 tim': '1TI', '2 tim': '2TI', '1 pet': '1PE', '2 pet': '2PE' })) aliases.set(compact(alias), id)
+for (const books of Object.values(bibles)) for (const book of books) {
+  for (const alias of [book.id, book.name, book.abbr, book.name.replace(/^San /, '')]) addAlias(alias, book.id)
+}
+addAlias('salmo', 'PSA')
+for (const [alias, id] of Object.entries({ psalm: 'PSA', salmos: 'PSA', 'song of songs': 'SNG', 'cantar de los cantares': 'SNG', 'cantar de cantares': 'SNG', 'cantares': 'SNG', john: 'JHN', jn: 'JHN', '1 cor': '1CO', '2 cor': '2CO', '1 thes': '1TH', '2 thes': '2TH', '1 tim': '1TI', '2 tim': '2TI', '1 pet': '1PE', '2 pet': '2PE' })) addAlias(alias, id)
 const aliasList = [...aliases.keys()].sort((a, b) => b.length - a.length)
 export const findBook = (value, language = 'en') => bibles[language].find(book => book.id === aliases.get(compact(value)))
 export const chapterHref = (book, chapter) => `/gospel?q=${encodeURIComponent(`${book} ${chapter}`)}`
@@ -77,8 +83,11 @@ export function parseReferences(query, language = 'en') {
 export function searchBible(input, language = 'en', pageInput = 1) {
   const query = typeof input === 'string' ? input.trim() : ''
   if (!query) return { type: 'browse', query, rows: [] }
-  if (query.length > 240) return { type: 'error', error: 'broad', query: query.slice(0, 240), rows: [] }
+  if (query.length > MAX_BIBLE_QUERY_LENGTH) return { type: 'error', error: 'broad', query: query.slice(0, MAX_BIBLE_QUERY_LENGTH), rows: [] }
   const parsed = parseReferences(query, language)
+  // Full book names can expand a valid multi-passage query. Keep the 20-reference
+  // and 500-verse caps, and retain the shorter limit for free-text word searches.
+  if (query.length > 240 && !parsed?.selections) return { type: 'error', error: 'broad', query: query.slice(0, 240), rows: [] }
   if (parsed?.error) return { type: 'error', error: parsed.error, query, rows: [] }
   if (parsed) {
     const unique = new Map()
@@ -99,6 +108,17 @@ export function searchBible(input, language = 'en', pageInput = 1) {
   const pages = Math.max(1, Math.ceil(matches.length / 40))
   const page = Math.min(pages, Math.max(1, /^\d{1,5}$/.test(String(pageInput)) ? Number(pageInput) : 1))
   return { type: 'words', query, total: matches.length, page, pages, rows: matches.slice((page - 1) * 40, page * 40).map(({ search: _search, ...verse }) => verse) }
+}
+
+// Keep stable book IDs in navigation URLs, but show localized full names to readers.
+export function readablePassageQuery(result) {
+  if (result.type !== 'passage') return result.query
+  return result.selections.map(({ book, bookOnly, chapter, endChapter, start, end }) => {
+    if (bookOnly) return book.name
+    if (end === Infinity) return `${book.name} ${chapter}${endChapter !== chapter ? `–${endChapter}` : ''}`
+    const range = endChapter !== chapter ? `–${endChapter}:${end}` : end !== start ? `–${end}` : ''
+    return `${book.name} ${chapter}:${start}${range}`
+  }).join('; ')
 }
 
 // Select a single verse with a complete one-to-one counterpart. Preserve the
