@@ -46,6 +46,32 @@ if Sanity reports it missing; the login screen alone does not mean CORS is wrong
 
 ## First post
 
+### Automatic Scripture links
+
+Write references normally in the post body, for example `John 3:16`,
+`Juan 3:16–18`, `Psalm 23`, or `1 Cor. 13:4–7`. The website automatically
+links recognized, valid passages to its Gospel reader. References may be bold,
+italic, or split across formatting spans. Existing manually added links are
+preserved. Separate named references each get their own link; numeric lists
+such as `John 3:16,18` share one link.
+
+The post's actual content language selects KJV or RV1909, including when the
+website displays a fallback translation. Clicking the link also switches the
+website language accordingly. Both existing and future posts benefit without
+editing the Sanity documents or redeploying Studio. No additional provider or
+credentials are needed. This does not translate or rewrite author content.
+
+Detection requires a recognized book name/abbreviation and chapter, optionally
+with verse numbers or ranges. Unnamed quotations, ambiguous prose, invalid
+references, URLs and unsupported notation remain unchanged. Automatic links are
+limited to 240 characters and 500 verses. The reader accepts up to 1,000
+characters for valid references so expanded full book names can be resubmitted;
+word searches remain limited to 240 characters, and references to 20 selections.
+Validation runs on the server;
+generated links only target the internal Gospel reader and contain no HTML.
+
+### Publishing
+
 1. Choose the intended workspace, open Revelations / Revelaciones and create a document.
 2. Write a title and body in at least one language. English and Spanish are
    independently written/reviewed; there is no automatic translation.

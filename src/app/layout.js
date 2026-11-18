@@ -39,7 +39,9 @@ export default async function RootLayout({ children }) {
               </nav>
             </details>
             <h1 className="site-title">
-              <Link className="site-home-link" href="/">Hakadosh Ministry</Link>
+              <Link className="site-home-link" href="/">
+                <span>Hakadosh Ministry</span>
+              </Link>
             </h1>
             <details className="language-menu" id="language-menu" name="header-menu" data-header-menu>
               <summary className="hero-button hero-button-primary language-toggle" aria-label={`${text.languageMenu}: ${text.selectedLanguage}`} aria-controls="language-options">

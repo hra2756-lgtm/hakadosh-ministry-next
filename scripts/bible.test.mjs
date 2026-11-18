@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { bibles, dailyPassages, getDailyPassage, parseReferences, searchBible, passageHref } from '../src/lib/bible.mjs'
+import { bibles, dailyPassages, getDailyPassage, parseReferences, searchBible, passageHref, readablePassageQuery } from '../src/lib/bible.mjs'
 import { alignmentRules } from '../src/lib/bible-alignment.mjs'
 
 test('both complete Bibles contain 66 ordered books and 1,189 populated chapters', () => {
@@ -55,6 +55,19 @@ test('RV1909 verses stay separate, including source chapter endings', () => {
   assert.equal(searchBible('Numbers 13', 'es').rows.length, 34)
   assert.equal(searchBible('3 John 1:14', 'es').rows[0].text, 'Porque espero verte en breve, y hablaremos boca á boca.')
   for (const book of bibles.es) for (const verses of book.chapters) for (const v of verses) assert.equal(v.start, v.end)
+})
+
+test('full book names can be resubmitted without changing the selected passages', () => {
+  for (const language of ['en', 'es']) {
+    for (const query of ['PRO 3:5,6; 2CH 7:14', 'JHN 3:36-4:2', '1CH 2-3', 'SNG', Array(20).fill('1TH 1:1').join(';')]) {
+      const original = searchBible(query, language)
+      assert.equal(original.type, 'passage')
+      const display = readablePassageQuery(original)
+      assert.deepEqual(searchBible(display, language).rows, original.rows, display)
+    }
+  }
+  assert.equal(searchBible('a'.repeat(1001)).error, 'broad')
+  assert.equal(readablePassageQuery(searchBible('faith')), 'faith')
 })
 
 test('malformed, excessive, nonexistent, and hostile queries fail safely', () => {

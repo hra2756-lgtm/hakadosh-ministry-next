@@ -59,3 +59,21 @@
 .blog-shell a:focus-visible,.blog-article a:focus-visible,.blog-article button:focus-visible,.blog-shell button:focus-visible{outline:2px solid #f1d982;outline-offset:5px;}
 @media(min-width:760px){.blog-featured:has(.blog-image){display:grid;grid-template-columns:1fr 1fr;align-items:center;}.blog-featured .blog-image{height:100%;min-height:320px;aspect-ratio:auto;}}
 @media(max-width:640px){.blog-shell{padding:36px 18px 60px;}.blog-grid{grid-template-columns:1fr;}.blog-heading{margin-bottom:30px;}.blog-card-content{padding:24px;}.blog-article{padding:28px 20px 60px;}.blog-prose{font-size:1.05rem;}.blog-meta{gap:8px 16px;}}
+
+/* Navy cards frame the parchment used for uninterrupted reading. */
+.blog-card,.blog-empty{background:var(--ministry-navy);border-color:var(--ministry-border);}
+.blog-image{background:var(--ministry-navy-deep);}
+.blog-article .blog-heading{padding:28px 24px;background:var(--ministry-navy);border:1px solid var(--ministry-border);border-radius:20px;}
+.blog-prose{max-width:none;padding:36px 40px;text-align:left;background:var(--ministry-paper);color:var(--ministry-ink);border:1px solid var(--ministry-border);border-radius:18px;}
+.blog-prose h2,.blog-prose h3{color:var(--ministry-ink);}
+.blog-prose blockquote{background:#e8dfc9;color:var(--ministry-ink);border-color:#947422;}
+.blog-prose .blog-inline-quote{color:var(--ministry-ink);background:#e8dfc9;border-color:#947422;}
+.blog-prose a{color:var(--ministry-paper-link);text-decoration-thickness:1px;}
+.blog-prose a:hover{color:#182e48;text-decoration-thickness:2px;}
+.blog-prose a:focus-visible{outline-color:var(--ministry-paper-link);}
+.blog-prose ::selection{background:#e6c76b;color:var(--ministry-ink);}
+.blog-article>.blog-share{padding:28px;background:var(--ministry-navy);border:1px solid var(--ministry-border);border-radius:18px;}
+.blog-share-actions a,.blog-share-actions button{background:var(--ministry-navy-deep);border-color:var(--ministry-border);}
+.blog-share-actions a:hover,.blog-share-actions button:hover{background:var(--ministry-navy-hover);}
+.blog-share{border-color:var(--ministry-border);}
+@media(max-width:640px){.blog-prose{padding:24px 20px;}.blog-article .blog-heading,.blog-article>.blog-share{padding:24px 20px;}}
