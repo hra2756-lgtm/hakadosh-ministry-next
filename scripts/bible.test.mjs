@@ -1,0 +1,128 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { bibles, dailyPassages, getDailyPassage, parseReferences, searchBible, passageHref } from '../src/lib/bible.mjs'
+import { alignmentRules } from '../src/lib/bible-alignment.mjs'
+
+test('both complete Bibles contain 66 ordered books and 1,189 populated chapters', () => {
+  for (const books of Object.values(bibles)) {
+    assert.equal(books.length, 66)
+    assert.equal(books[0].id, 'GEN')
+    assert.equal(books[38].id, 'MAL')
+    assert.equal(books[39].id, 'MAT')
+    assert.equal(books[65].id, 'REV')
+    assert.equal(books.reduce((n, book) => n + book.chapters.length, 0), 1189)
+    for (const book of books) for (const chapter of book.chapters) {
+      assert.ok(chapter.length)
+      let previous = 0
+      for (const verse of chapter) {
+        assert.equal(verse.start, previous + 1, `${book.id}: missing verse after ${previous}`)
+        previous = verse.end
+        assert.ok(verse.text.trim())
+        assert.doesNotMatch(verse.text, /[<>\uFFFD]/)
+      }
+    }
+  }
+  assert.equal(bibles.en.flatMap(b => b.chapters.flat()).length, 31102)
+  assert.equal(bibles.es.flatMap(b => b.chapters.flat()).length, 31102)
+  assert.match(searchBible('Genesis 1:1').rows[0].text, /^In the beginning God created the heaven and the earth\.$/)
+  assert.match(searchBible('Génesis 1:1', 'es').rows[0].text, /^EN el principio crió Dios los cielos y la tierra\.$/)
+})
+
+test('reference search supports both languages, ranges, commas, and multiple books', () => {
+  for (const language of ['en', 'es']) {
+    assert.equal(searchBible('John 3', language).rows.at(-1).end, 36)
+    assert.equal(searchBible('Juan 3:16–18', language).rows[0].start, 16)
+    const multi = searchBible('John 3:16,18; Romanos 8:28', language)
+    assert.equal(multi.type, 'passage')
+    assert.deepEqual(multi.rows.map(v => v.book), ['JHN', 'JHN', 'ROM'])
+    assert.deepEqual(multi.rows.map(v => v.start), [16, 18, 28])
+    assert.equal(searchBible('John 3:36-4:2', language).rows.at(-1).chapter, 4)
+    assert.equal(searchBible('1 John 1:1', language).rows[0].book, '1JN')
+    assert.equal(searchBible('1Corinthians 13', language).rows[0].book, '1CO')
+    assert.equal(searchBible('Salmos 119', language).rows.at(-1).end, 176)
+    assert.equal(searchBible('Revelation 22:21', language).rows[0].book, 'REV')
+    assert.equal(searchBible('John', language).rows[0].chapter, 1)
+    assert.equal(searchBible('John 3:16; John 3:16', language).rows.length, 1)
+  }
+})
+
+test('RV1909 verses stay separate, including source chapter endings', () => {
+  const result = searchBible('Genesis 1:11,12', 'es')
+  assert.equal(result.rows.length, 2)
+  assert.deepEqual(result.rows.map(v => v.verse), ['11', '12'])
+  assert.equal(result.rows[0].reference, 'Génesis 1:11')
+  assert.equal(searchBible('Job 39', 'es').rows.length, 38)
+  assert.equal(searchBible('Numbers 13', 'es').rows.length, 34)
+  assert.equal(searchBible('3 John 1:14', 'es').rows[0].text, 'Porque espero verte en breve, y hablaremos boca á boca.')
+  for (const book of bibles.es) for (const verses of book.chapters) for (const v of verses) assert.equal(v.start, v.end)
+})
+
+test('malformed, excessive, nonexistent, and hostile queries fail safely', () => {
+  for (const query of ['John 0', 'John 22', 'John 3:0', 'John 3:99', 'John 4-3', 'John 3:18-16', 'John 1-21', 'John 3:16;', 'Fakebook 3:16', 'John ' + '1'.repeat(240)]) {
+    const result = searchBible(query)
+    assert.equal(result.type, 'error', query)
+    assert.equal(result.rows.length, 0)
+  }
+  assert.equal(searchBible('a').error, 'short')
+  assert.equal(searchBible('a'.repeat(241)).error, 'broad')
+  assert.equal(parseReferences(Array(21).fill('John 1').join(';')).error, 'broad')
+  assert.equal(searchBible('<script>alert(1)</script>').rows.length, 0)
+  assert.equal(searchBible(['John 1', 'John 2']).type, 'browse')
+})
+
+test('keyword search is accent/case insensitive, supports phrases and bounds pagination', () => {
+  const first = searchBible('amor', 'es')
+  assert.ok(first.total > 40)
+  assert.equal(first.rows.length, 40)
+  assert.deepEqual(searchBible('AMOR', 'es').rows, first.rows)
+  assert.deepEqual(searchBible('Espíritu', 'es').rows, searchBible('espiritu', 'es').rows)
+  assert.ok(searchBible('"God so loved"').rows.some(v => v.reference === 'John 3:16'))
+  assert.ok(searchBible('God world').rows.some(v => v.reference === 'John 3:16'))
+  assert.equal(searchBible('love', 'en', -1).page, 1)
+  const last = searchBible('love', 'en', 99999)
+  assert.equal(last.page, last.pages)
+  assert.ok(!first.rows.some(a => searchBible('amor', 'es', 2).rows.some(b => a.key === b.key)))
+})
+
+test('every daily passage links to the exact same displayed text in both languages', () => {
+  assert.equal(new Set(dailyPassages.map(p => p.en.book)).size, 66)
+  for (const pair of dailyPassages) for (const language of ['en', 'es']) {
+    const v = pair[language]
+    const result = searchBible(`${v.book} ${v.chapter}:${v.verse}`, language)
+    assert.equal(result.type, 'passage', v.reference)
+    assert.equal(result.rows.map(row => row.text).join(' '), v.text, v.reference)
+    const url = new URL(passageHref(v.book, v.chapter, v.verse, language), 'https://example.org')
+    assert.equal(url.pathname, '/gospel/open')
+    assert.equal(url.searchParams.get('lang'), language)
+  }
+  assert.equal(dailyPassages.length, 31084)
+  for (const pair of dailyPassages) for (const v of Object.values(pair)) assert.match(v.verse, /^\d+$/)
+  assert.equal(dailyPassages.find(p => p.en.book === 'JON' && p.en.chapter === 1 && p.en.verse === '17').es.reference, 'Jonás 2:1')
+  assert.equal(dailyPassages.find(p => p.en.book === 'JOB' && p.en.chapter === 40 && p.en.verse === '1').es.reference, 'Job 39:34')
+  assert.equal(dailyPassages.find(p => p.en.book === '2CO' && p.en.chapter === 13 && p.en.verse === '14').es.verse, '13')
+})
+
+test('daily mappings plus explicitly excluded unequal groups cover both entire editions exactly once', () => {
+  for (const [language, offset] of [['en', 1], ['es', 4]]) {
+    const seen = new Set(dailyPassages.map(pair => `${pair[language].book}.${pair[language].chapter}.${pair[language].verse}`))
+    assert.equal(seen.size, dailyPassages.length)
+    for (const rule of alignmentRules) {
+      if (rule[3] - rule[2] === rule[6] - rule[5]) continue
+      for (let v = rule[offset + 1]; v <= rule[offset + 2]; v++) {
+        const key = `${rule[0]}.${rule[offset]}.${v}`
+        assert.ok(!seen.has(key), key)
+        seen.add(key)
+      }
+    }
+    const all = bibles[language].flatMap(b => b.chapters.flatMap((c, i) => c.map(v => `${b.id}.${i + 1}.${v.verse}`)))
+    assert.equal(seen.size, all.length)
+    for (const key of all) assert.ok(seen.has(key), key)
+  }
+})
+
+test('daily selection remains shared and stable across Eastern-time day boundaries', () => {
+  for (const [start, end] of [['2026-11-17T05:00:00Z', '2026-11-18T04:59:59Z'], ['2026-03-08T05:00:00Z', '2026-03-09T03:59:59Z']]) {
+    assert.equal(getDailyPassage(new Date(start)), getDailyPassage(new Date(end)))
+    assert.notEqual(getDailyPassage(new Date(start)), getDailyPassage(new Date(Date.parse(end) + 1000)))
+  }
+})

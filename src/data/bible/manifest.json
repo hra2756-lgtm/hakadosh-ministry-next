@@ -1,0 +1,20 @@
+{
+  "en": {
+    "source": "https://ebible.org/Scriptures/eng-kjv_usfx.zip",
+    "sha256": "0f0df18d7fe9f6f9c27c5028b8af656971941fa8d34a5473830c5d2c40df6fdd",
+    "books": 66,
+    "chapters": 1189,
+    "segments": 31102,
+    "coveredVerses": 31102
+  },
+  "es": {
+    "source": "https://open.bible/bibles/reina-valera-1909",
+    "download": "https://api.open.bible/artifactContent/67c4a8cf-fa7c-487d-aa83-a9ba5bac4f4d",
+    "provider": "United Bible Societies",
+    "revision": 10,
+    "sha256": "e5815e210cc424f240ee8b4e264740d8dff2a7533c4d022f1d73a3849863980e",
+    "books": 66,
+    "chapters": 1189,
+    "segments": 31102
+  }
+}

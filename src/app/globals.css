@@ -212,6 +212,13 @@ body{
   overflow-wrap:anywhere;
 }
 
+.daily-verse-link{color:inherit;text-decoration:none;transition:border-color .2s,background .2s;}
+.daily-verse-link:hover{border-color:#e6c76b;background:rgba(230,199,107,.06);}
+.daily-verse-link:focus-visible{outline:2px solid #f5e19c;outline-offset:6px;}
+.daily-verse-read{margin-top:22px;font-size:.85rem;color:#e6c76b;}
+.daily-bible-credit{padding:0 20px 24px;font-size:.72rem;line-height:1.7;color:#bfb9a8;}
+.daily-bible-credit a{color:#d9b85f;}
+
 .hero-button{
   display:inline-block;
   padding:14px 26px;
