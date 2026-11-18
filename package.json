@@ -6,6 +6,8 @@
     "postinstall": "node scripts/patch-picomatch.cjs",
     "prebuild": "node scripts/patch-picomatch.cjs --verify",
     "test:security-patch": "node --test scripts/picomatch-security.test.cjs",
+    "test:security-audit": "node --test scripts/security-audit.test.cjs",
+    "security:audit": "node scripts/security-audit.cjs",
     "dev": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next dev",
     "build": "next build",
     "start": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next start",

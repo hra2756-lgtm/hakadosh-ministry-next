@@ -55,11 +55,34 @@ projects passed, both production builds passed, lint passed, all 32 application
 and backup tests passed, and the Gospel browser checks passed (search, session
 highlights, languages, daily links, mobile layout, invalid input, no-JS reading).
 
-## Audit and release status
+## Owner-approved guarded audit exception
 
-The original `npm audit --audit-level=moderate` gates remain in place for both
-projects. npm audits package versions, not the installed parser bytes, so this
-local mitigation does **not** make that advisory disappear. The PR must remain
-open while those audits fail unless the owner separately approves a reviewed
-policy for this verified local patch. No audit exception is included here.
-The production website and hosted Studio have not been changed by this work.
+The owner approved integrating this policy on `test`/PR #11 on November 17,
+2026. This does not authorize merging or deploying production.
+
+Both CI jobs now use `npm run security:audit`. It requires the exact installed
+patch, reruns bounded attack/compatibility tests, obtains a fresh full npm audit,
+and verifies the patch again before deciding. The complete original audit JSON
+remains visible. There is no cached-report, skip-test, ignore-list, or alternate
+date option. Network/audit errors and malformed reports block the check.
+
+Only GHSA-fc5q-39xc-vjpf, for the reviewed picomatch package, high severity and
+`<=4.0.7` affected range, is accepted with verified protection. Every reported
+affected copy must be among the verified installed packages. Dependency-chain
+findings must trace solely to that advisory. Any other moderate-or-higher
+advisory blocks release, preserving the previous severity threshold.
+
+The exception expires at **2026-11-25 06:00 UTC**, the end of November 24 in
+Mexico City. It cannot extend itself. Expiry blocks subsequent checks; it does
+not shut down a site already deployed. Any extension requires another review
+and owner approval. Once an official fix is available, test that update, remove
+the temporary patch/hooks/policy, and restore the ordinary npm audit commands.
+
+This is explicit temporary risk acceptance for a tested local mitigation, not
+an official upstream fix or a claim that the raw npm audit is clean. CI prints
+`mitigated-with-explicit-temporary-exception` when using the exception. The patch
+still has the compatibility and maintenance limitations described above.
+
+Validate the policy with `npm run test:security-audit` from the repository root.
+The tests cover other advisories, changed advisory details, missing protection,
+expiry, malformed/incomplete reports, cycles, and failed fresh audits.
