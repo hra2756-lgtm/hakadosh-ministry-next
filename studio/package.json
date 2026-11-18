@@ -7,6 +7,9 @@
     "node": ">=22.12"
   },
   "scripts": {
+    "postinstall": "node ../scripts/patch-picomatch.cjs",
+    "prebuild": "node ../scripts/patch-picomatch.cjs --verify",
+    "test:security-patch": "node --test ../scripts/picomatch-security.test.cjs",
     "dev": "sanity dev --host 127.0.0.1 --port 3333",
     "build": "sanity build",
     "validate": "sanity schema validate",

@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify picomatch mitigation
+        run: npm run test:security-patch
+
       - name: Run lint
         run: npm run lint
 
@@ -57,6 +60,9 @@ jobs:
         working-directory: studio
       - name: Validate backup archives
         run: npm run test:backup
+      - name: Verify Studio picomatch mitigation
+        run: npm run test:security-patch
+        working-directory: studio
       - run: npm run build
         working-directory: studio
       - run: npm audit --audit-level=moderate

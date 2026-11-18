@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "node scripts/patch-picomatch.cjs",
+    "prebuild": "node scripts/patch-picomatch.cjs --verify",
+    "test:security-patch": "node --test scripts/picomatch-security.test.cjs",
     "dev": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next dev",
     "build": "next build",
     "start": "node scripts/with-youtube-key.cjs node_modules/next/dist/bin/next start",
