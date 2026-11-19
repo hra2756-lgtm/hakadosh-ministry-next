@@ -1,3 +1,4 @@
+import { isNewTestament } from '../../lib/bible.mjs'
 /* eslint-disable @next/next/no-img-element -- Sanity CDN URLs are validated; images need no browser JavaScript. */
 import { safeHttpsUrl } from '../../lib/blog-data.mjs'
 import { scriptureSegments, postScriptureQuotations } from '../../lib/scripture-links.mjs'
@@ -34,7 +35,7 @@ function spans(block, language) {
 
 function ScriptureQuotes({ blocks, language }) {
   const version = language === 'es' ? 'BES' : 'BSB'
-  return postScriptureQuotations(blocks, language).map(quote => <aside className="blog-scripture-quote" key={quote.href} aria-label={`${quote.reference} (${version})`}>
+  return postScriptureQuotations(blocks, language).map(quote => <aside data-testament={isNewTestament(quote.rows[0].book) ? 'new' : 'old'} className="blog-scripture-quote" key={quote.href} aria-label={`${quote.reference} (${version})`}>
     <div className="blog-scripture-caption"><a href={quote.href}>{quote.reference}</a><span>{version}</span></div>
     <blockquote>{quote.rows.map(row => <p key={row.key}><sup aria-label={row.reference}>{row.verse}</sup> {row.text}</p>)}</blockquote>
     <a className="blog-scripture-read" href={quote.href}>{language === 'es' ? 'Leer en la Biblia' : 'Read in the Bible'} →</a>

@@ -3,13 +3,62 @@
 (() => {
   const book = document.getElementById('bible-book')
   const chapter = document.getElementById('bible-chapter')
+  const chapterMenu = document.getElementById('bible-chapter-menu')
+  const chapterToggle = document.querySelector('.bible-chapter-toggle')
+  const calendar = chapterMenu?.querySelector('.bible-chapter-calendar')
   if (book && chapter) {
+    const sync = () => calendar?.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.chapter === chapter.value)))
     const update = () => {
       chapter.max = book.selectedOptions[0].dataset.chapters
       if (Number(chapter.value) > Number(chapter.max)) chapter.value = '1'
+      if (calendar) {
+        calendar.replaceChildren(...Array.from({length: Number(chapter.max)}, (_, i) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.textContent = String(i + 1)
+          button.dataset.chapter = String(i + 1)
+          return button
+        }))
+        sync()
+      }
+      document.querySelector('.bible-search-panel').dataset.testament = book.selectedOptions[0].dataset.testament
     }
     update()
     book.addEventListener('change', update)
+    chapter.addEventListener('input', sync)
+    if (chapterMenu && chapterToggle && typeof chapterMenu.showPopover === 'function') {
+      chapterToggle.hidden = false
+      chapterMenu.addEventListener('toggle', event => {
+        chapterToggle.setAttribute('aria-expanded', String(event.newState === 'open'))
+        if (event.newState !== 'open') return
+        const rect = chapter.getBoundingClientRect()
+        chapterMenu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - chapterMenu.offsetWidth - 8))}px`
+        const below = innerHeight - rect.bottom - 12
+        const above = rect.top - 12
+        const available = below >= Math.min(330, above) ? below : above
+        chapterMenu.style.maxHeight = `${Math.min(330, Math.max(80, available))}px`
+        chapterMenu.style.top = `${below >= Math.min(330, above) ? rect.bottom + 6 : Math.max(8, rect.top - chapterMenu.offsetHeight - 6)}px`
+        const selected = calendar.querySelector('[aria-pressed="true"]') || calendar.querySelector('button')
+        selected?.focus({ preventScroll: true })
+        selected?.scrollIntoView({ block: 'nearest' })
+      })
+      calendar.addEventListener('click', event => {
+        const button = event.target.closest('button[data-chapter]')
+        if (!button) return
+        chapter.value = button.dataset.chapter
+        sync()
+        chapterMenu.hidePopover()
+        chapterToggle.focus()
+      })
+      calendar.addEventListener('keydown', event => {
+        const buttons = [...calendar.querySelectorAll('button')]
+        const index = buttons.indexOf(event.target)
+        const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[event.key]
+        if (index < 0 || !step) return
+        event.preventDefault()
+        buttons[Math.max(0, Math.min(buttons.length - 1, index + step))].focus()
+      })
+    }
   }
   const container = document.querySelector('[data-bible-passages]')
   const tools = document.querySelector('[data-highlight-tools]')

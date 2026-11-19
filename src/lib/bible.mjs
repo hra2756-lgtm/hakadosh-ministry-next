@@ -5,6 +5,8 @@ import { getVerseOfTheDay } from './verse-of-the-day.js'
 import { spanishDailyReference } from './bible-alignment.mjs'
 
 export const bibles = { en: english, es: spanish }
+const newTestamentBooks = new Set(english.slice(39).map(book => book.id))
+export const isNewTestament = book => newTestamentBooks.has(book)
 export const MAX_BIBLE_QUERY_LENGTH = 1000
 export const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[.]/g, '').replace(/\s+/g, ' ').trim()
 const compact = value => normalize(value).replace(/[–—]/g, '-').replace(/\s/g, '')

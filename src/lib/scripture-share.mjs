@@ -20,7 +20,7 @@ export function scriptureShare(query, language) {
     path: `/gospel/share?${params}`,
     url: `${SITE_ORIGIN}/gospel/share?${params}`,
     // New editions must not reuse cached images of the previous translations.
-    image: `/gospel/share/image?${params}&edition=${language === 'es' ? 'bes-2026' : 'bsb-3'}`,
+    image: `/gospel/share/image?${params}&edition=${language === 'es' ? 'bes-2026' : 'bsb-3'}&layout=3`,
     reader: `/gospel/open?${params}`,
   }
 }
