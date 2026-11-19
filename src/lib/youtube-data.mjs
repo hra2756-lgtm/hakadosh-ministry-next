@@ -1,9 +1,9 @@
 // This module is used by the server-only adapter and Node verification scripts.
 // The API key is supplied in memory and is never part of URLs or returned data.
-export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetchImpl = fetch }) {
+function youtubeRequest(apiKey, fetchImpl) {
   if (!apiKey || apiKey === 'PASTE_YOUR_KEY_HERE') throw new Error('YOUTUBE_NOT_CONFIGURED')
 
-  async function request(resource, params) {
+  return async function request(resource, params) {
     const url = new URL(`https://www.googleapis.com/youtube/v3/${resource}`)
     url.search = new URLSearchParams(params)
     try {
@@ -19,6 +19,31 @@ export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetch
       throw new Error('YOUTUBE_UNAVAILABLE')
     }
   }
+}
+
+export function durationLabel(value) {
+  const match = /^P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(value || '')
+  if (!match) return null
+  const seconds = Number(match[1] || 0) * 86400 + Number(match[2] || 0) * 3600 + Number(match[3] || 0) * 60 + Number(match[4] || 0)
+  if (!Number.isSafeInteger(seconds) || seconds <= 0) return null
+  const hours = Math.floor(seconds / 3600), minutes = Math.floor(seconds % 3600 / 60)
+  return `${hours ? `${hours}:` : ''}${hours ? String(minutes).padStart(2, '0') : minutes}:${String(seconds % 60).padStart(2, '0')}`
+}
+
+export async function fetchChannelStatistics({ channelId, apiKey, fetchImpl = fetch }) {
+  const request = youtubeRequest(apiKey, fetchImpl)
+  const data = await request('channels', { part: 'statistics', id: channelId })
+  const item = data.items?.find(item => item.id === channelId)
+  if (!item?.statistics) throw new Error('YOUTUBE_INVALID_RESPONSE')
+  const count = value => typeof value === 'string' && /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : null
+  return {
+    subscribers: item.statistics.hiddenSubscriberCount ? null : count(item.statistics.subscriberCount),
+    videos: count(item.statistics.videoCount),
+  }
+}
+
+export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetchImpl = fetch }) {
+  const request = youtubeRequest(apiKey, fetchImpl)
 
   const ids = new Set()
   const tokens = new Set()
@@ -41,7 +66,7 @@ export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetch
   const allIds = [...ids]
   for (let offset = 0; offset < allIds.length; offset += 50) {
     const data = await request('videos', {
-      part: 'snippet,status', id: allIds.slice(offset, offset + 50).join(','),
+      part: 'snippet,status,contentDetails', id: allIds.slice(offset, offset + 50).join(','),
     })
     if (!Array.isArray(data.items)) throw new Error('YOUTUBE_INVALID_RESPONSE')
     for (const item of data.items) {
@@ -58,6 +83,7 @@ export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetch
       videos.push({
         id: item.id, title: snippet.title, publishedAt: snippet.publishedAt,
         thumbnail, embeddable: item.status.embeddable === true,
+        duration: durationLabel(item.contentDetails?.duration),
       })
     }
   }

@@ -12,14 +12,14 @@ are in canonical order, 40 per page. Reference searches return at most 500 verse
 Searching a book opens its first chapter; chapter links open the rest.
 Context recommendations link to the first three chapters represented in results.
 
-The shared language cookie selects KJV or Reina-Valera 1909. Daily cards are normal links
+The shared language cookie selects BSB or La Biblia en Español Sencillo. Daily cards are normal links
 to `/gospel/open`, which validates the reference, sets the language cookie, and
 redirects only to `/gospel`. It is not prefetched or shared-cached. Search pages
 are request-rendered to prevent language leakage between visitors.
 
 Highlights are character offsets in `sessionStorage`, separately keyed by
-edition. Spanish uses a new storage key so old NBV highlight offsets cannot
-apply to RV1909 text. They survive navigation/reload in the same browser tab and are
+edition. Both editions use new storage keys so earlier KJV/RV1909 highlight offsets
+cannot apply to BSB/BES text. They survive navigation/reload in the same browser tab and are
 normally removed when that tab's session ends (browser session restoration may
 restore them). Clear highlights removes the current translation's highlights.
 Nothing is uploaded. Storage values are validated and never interpreted as HTML.
@@ -48,3 +48,36 @@ development this also produces a `self.__next_r` request-ID console error. Gospe
 features still passed, but the clean browser verification uses the production-style
 local preview (`npm run build`, then `npm run start -- --port 3100`). No CSP change
 was made for this feature. Production preview has no page runtime errors.
+
+## Scripture sharing
+
+Reference results have WhatsApp, X, Instagram, and a camera icon. The camera is
+an image download, not access to a device camera. It exports only the reference,
+edition, Scripture text, and ministry credit in parchment/gold styling. It does
+not capture menus, controls, personal highlights, or any visitor information.
+
+WhatsApp and X share an absolute production URL at `/gospel/share?lang=...&q=...`.
+This public server-rendered page preserves the full passage and explicitly selects
+BSB or BES independently of cookies, so crawlers receive the correct edition.
+It includes Open Graph and X large-image metadata. Open in the Gospel reader sets
+the language cookie and opens the same reference. Share pages are noindex.
+
+`/gospel/share/image` uses Next's included ImageResponse to generate PNGs without
+new packages or credentials. Only validated local Bible passages are accepted;
+arbitrary text, remote URLs, keyword searches and invalid languages are rejected.
+Image URLs include an edition marker so older translation images are not reused.
+Preview images are 1200×630; downloads are 1080 pixels wide with a bounded height.
+Long passages use readable, explicitly labelled excerpts, while shared links keep
+the full passage. No AI-generated or paraphrased Scripture text is used.
+
+Instagram uses native file sharing when the browser supports it; the visitor picks
+Instagram if it is offered by their device. It cannot automatically attach an
+image to Instagram's web composer. Unsupported devices download the PNG and show
+instructions to attach it manually. Cancellation performs no fallback download.
+Without JavaScript, Instagram and camera both remain ordinary download links.
+
+Local verification covers PNG responses/downloads, bilingual metadata, cookie
+isolation, reader redirects, native-sharing success/cancel and download fallback,
+invalid image inputs, and narrow mobile layouts. Actual WhatsApp/X preview fetching
+requires a public deployment and remains subject to platform caching/settings.
+Do not claim those platforms displayed a preview based only on localhost tests.

@@ -7,7 +7,7 @@ assert.ok(apiKey && apiKey.length > 10, 'A configured API key is required')
 const base = new URL(process.argv[2] ?? 'http://localhost:3000')
 assert.ok(['localhost', '127.0.0.1'].includes(base.hostname), 'Use a local verification server')
 
-for (const route of ['/', '/youtube-spanish', '/youtube-english', '/youtube-english?videos=12&shorts=6', '/youtube-player.js']) {
+for (const route of ['/', '/youtube-spanish', '/youtube-english', '/youtube-english?playlist=shorts', '/youtube-player.js']) {
   const response = await fetch(new URL(route, base))
   assert.equal(response.status, 200, `Unexpected status for ${route}`)
   const body = await response.text()
@@ -15,9 +15,10 @@ for (const route of ['/', '/youtube-spanish', '/youtube-english', '/youtube-engl
   if (route.startsWith('/youtube-') && route !== '/youtube-player.js') {
     const csp = response.headers.get('content-security-policy') ?? ''
     assert.ok(csp.includes('frame-src https://www.youtube-nocookie.com'), 'Missing frame policy')
-    assert.ok(body.includes('data-youtube-src='), 'Expected loaded video cards')
-    const count = [...body.matchAll(/<article class="youtube-card /g)].length
-    assert.equal(count, route.includes('?') ? 18 : 12, 'Unexpected card count')
+    assert.ok(body.includes('data-youtube-src='), 'Expected a selected player')
+    assert.equal([...body.matchAll(/<iframe /g)].length, 1, 'Only the selected video should have a player')
+    assert.ok(body.includes('data-queue-video='), 'Expected a video queue')
+    assert.ok(body.includes('sub_confirmation=1'), 'Expected a subscription link')
   }
 }
 
@@ -40,4 +41,4 @@ let checkedFiles = 0
 for (const directory of ['src', 'public', 'scripts', 'docs', '.next/cache', '.next/static', '.next/server']) {
   checkedFiles += await scan(directory)
 }
-console.log(`Response, pagination, CSP and credential-isolation checks passed (${checkedFiles} files scanned).`)
+console.log(`Response, playlist, CSP and credential-isolation checks passed (${checkedFiles} files scanned).`)

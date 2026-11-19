@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- Sanity CDN URLs are validated; images need no browser JavaScript. */
 import { safeHttpsUrl } from '../../lib/blog-data.mjs'
-import { scriptureSegments } from '../../lib/scripture-links.mjs'
+import { scriptureSegments, scriptureQuotations } from '../../lib/scripture-links.mjs'
 
 export function BlogImage({ post, priority = false }) {
   return post.image ? <img className="blog-image" src={post.image} alt={post.alt} loading={priority ? 'eager' : 'lazy'} decoding="async" referrerPolicy="no-referrer" /> : null
@@ -18,6 +18,8 @@ function spans(block, language) {
         if (mark === 'strong') node = <strong>{node}</strong>
         else if (mark === 'em') node = <em>{node}</em>
         else if (mark === 'inlineQuote') node = <q className="blog-inline-quote">{node}</q>
+        else if (mark === 'highlight') node = <mark className="blog-highlight">{node}</mark>
+        else if (mark === 'underline') node = <u className="blog-gold-underline">{node}</u>
         else {
           const definition = block.markDefs?.find(item => item._key === mark && item._type === 'link')
           const href = safeHttpsUrl(definition?.href)
@@ -30,7 +32,17 @@ function spans(block, language) {
   })
 }
 
-export function BlogBody({ blocks, language = 'en' }) {
+function ScriptureQuotes({ block, language, enabled }) {
+  if (!enabled) return null
+  const version = language === 'es' ? 'BES' : 'BSB'
+  return scriptureQuotations(block, language).map(quote => <aside className="blog-scripture-quote" key={quote.href} aria-label={`${quote.reference} (${version})`}>
+    <div className="blog-scripture-caption"><a href={quote.href}>{quote.reference}</a><span>{version}</span></div>
+    <blockquote>{quote.rows.map(row => <p key={row.key}><sup aria-label={row.reference}>{row.verse}</sup> {row.text}</p>)}</blockquote>
+    <a className="blog-scripture-read" href={quote.href}>{language === 'es' ? 'Leer en la Biblia' : 'Read in the Bible'} →</a>
+  </aside>)
+}
+
+export function BlogBody({ blocks, language = 'en', automaticScriptureQuotes = true }) {
   const elements = []
   // Render only supported Portable Text nodes. Never interpret author text as HTML.
   for (let i = 0; i < blocks.length; i++) {
@@ -39,7 +51,7 @@ export function BlogBody({ blocks, language = 'en' }) {
     if (block.listItem === 'bullet' || block.listItem === 'number') {
       const items = []
       const kind = block.listItem
-      do { items.push(<li key={i}>{spans(blocks[i], language)}</li>); i++ }
+      do { items.push(<li key={i}>{spans(blocks[i], language)}<ScriptureQuotes block={blocks[i]} language={language} enabled={automaticScriptureQuotes} /></li>); i++ }
       while (i < blocks.length && blocks[i]._type === 'block' && blocks[i].listItem === kind)
       i--
       const List = kind === 'number' ? 'ol' : 'ul'
@@ -47,6 +59,7 @@ export function BlogBody({ blocks, language = 'en' }) {
     } else {
       const Tag = ['h2', 'h3', 'blockquote'].includes(block.style) ? block.style : 'p'
       elements.push(<Tag key={block._key || i}>{spans(block, language)}</Tag>)
+      elements.push(<ScriptureQuotes key={`scripture-${i}`} block={block} language={language} enabled={automaticScriptureQuotes} />)
     }
   }
   return <div className="blog-prose">{elements}</div>

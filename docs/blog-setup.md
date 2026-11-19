@@ -55,7 +55,7 @@ italic, or split across formatting spans. Existing manually added links are
 preserved. Separate named references each get their own link; numeric lists
 such as `John 3:16,18` share one link.
 
-The post's actual content language selects KJV or RV1909, including when the
+The post's actual content language selects BSB or BES, including when the
 website displays a fallback translation. Clicking the link also switches the
 website language accordingly. Both existing and future posts benefit without
 editing the Sanity documents or redeploying Studio. No additional provider or
@@ -133,6 +133,27 @@ This local integration is **not** a completed production rollout.
 6. Configure the chosen Studio host/CORS explicitly, review on test, then obtain
    the user's go-live instruction before merging to main.
 
+## Automatic Scripture quotations and text emphasis
+
+- On the local Studio, select the **Development (Testing)** workspace. The hosted
+  Studio will gain these controls only when its updated code is deployed.
+- **Automatic Scripture quotations / Citas bíblicas automáticas** defaults to on
+  for both new and existing posts. Set it to off and publish to suppress generated
+  quotations for that post, in both languages; Scripture links remain active.
+- Put a reference on its own paragraph, for example `Psalm 23:1–2` or
+  `Salmo 23:1–2`. Multiple references and references split across bold/italic
+  formatting work. The website renders exact BSB / BES verses below that
+  paragraph using the post's actual content language, including language fallback.
+- This does not modify the saved Sanity body or automatically translate prose.
+  References inside sentences, chapter-only references (`Psalm 91`), manually
+  linked references, and blockquotes stay links without generated quotations.
+  Existing posts with separately written quotations can opt out to avoid duplicates.
+- Select words in either language's body editor and choose **Gold highlight** or
+  **Golden underline**. Highlights use a gold background; underlines have a static
+  gold glow. They can be combined with bold, italic, and inline quotations.
+- Bible verse ranges use the Gospel reader's validation and limits; invalid or
+  excessively broad references are not expanded. No AI, new API, or dependency.
+
 ## Checks
 
 ```powershell
@@ -140,7 +161,8 @@ npm.cmd run lint
 npm.cmd run test:blog
 npm.cmd run build
 npm.cmd run studio:build
-npm.cmd --prefix studio run validate
+npm.cmd --prefix studio run validate -- --workspace development
+npm.cmd --prefix studio run validate -- --workspace production
 ```
 
 Official references:

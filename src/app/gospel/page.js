@@ -1,6 +1,8 @@
 import { getLanguage, getPageMetadata } from '../../lib/language'
 import { bibles, chapterHref, findBook, reference, searchBible, readablePassageQuery, MAX_BIBLE_QUERY_LENGTH } from '../../lib/bible.mjs'
 import { gospelText } from '../../lib/gospel-translations.mjs'
+import { scriptureShare } from '../../lib/scripture-share.mjs'
+import { ScriptureShare } from '../components/scripture-share'
 import './gospel.css'
 
 export async function generateMetadata() { return getPageMetadata('gospel') }
@@ -13,6 +15,7 @@ export default async function GospelPage({ searchParams }) {
   const requestedBook = typeof params.book === 'string' ? findBook(params.book, language) : null
   const query = params.q ?? (params.book ? `${requestedBook?.id || '?'} ${typeof params.chapter === 'string' ? params.chapter : '1'}` : '')
   const result = searchBible(query, language, params.page)
+  const share = result.type === 'passage' ? scriptureShare(result.query, language) : null
   const selected = result.rows[0]
   const selectedBook = selected ? findBook(selected.book, language) : requestedBook || books[0]
   const selectedChapter = selected?.chapter || 1
@@ -75,6 +78,7 @@ export default async function GospelPage({ searchParams }) {
         {result.type === 'words' && !result.rows.length && <p className="bible-notice">{t.none}</p>}
         {!!result.rows.length && <>
           <div className="bible-reading-panel">
+            <div className="bible-reading-top">
             {singleChapter && <header className="bible-chapter-heading"><h3>{reference(selectedBook, selectedChapter, verseLabel)}</h3><p>{t.version}</p>
               <details><summary>{t.chapters}</summary><nav className="bible-chapter-grid" aria-label={t.chapters}>{selectedBook.chapters.map((_, i) => <a key={i} href={chapterHref(selectedBook.id, i + 1)} aria-current={selectedChapter === i + 1 ? 'page' : undefined}>{i + 1}</a>)}</nav></details>
             </header>}
@@ -82,16 +86,18 @@ export default async function GospelPage({ searchParams }) {
               <div><button type="button" data-highlight-add>{t.highlight} <span aria-hidden="true">✎</span></button><button type="button" data-highlight-clear>{t.clear}</button></div>
               <p>{t.highlightHelp}</p><p data-highlight-status role="status" aria-live="polite" />
             </div>
+            </div>
             <div className="bible-passages" data-bible-passages data-language={language}>
               {result.rows.map(verse => <article key={verse.key} className="bible-verse" id={`verse-${verse.key}`}>
                 <a className="bible-verse-number" href={`${chapterHref(verse.book, verse.chapter)}#verse-${verse.key}`} aria-label={verse.reference}>{singleChapter ? verse.verse : verse.reference}</a>
                 <p data-verse-text={verse.key}>{verse.text}</p>
               </article>)}
             </div>
-            {singleChapter && <nav className="bible-chapter-navigation" aria-label={t.chapters}>
-              {selectedChapter > 1 ? <a href={chapterHref(selectedBook.id, selectedChapter - 1)}>← {t.previousChapter}</a> : <span />}
-              {selectedChapter < selectedBook.chapters.length && <a href={chapterHref(selectedBook.id, selectedChapter + 1)}>{t.nextChapter} →</a>}
-            </nav>}
+            {(singleChapter || share) && <div className="bible-reading-footer">
+              {singleChapter && selectedChapter > 1 ? <a href={chapterHref(selectedBook.id, selectedChapter - 1)}>← {t.previousChapter}</a> : <span />}
+              {share && <ScriptureShare share={share} text={t} />}
+              {singleChapter && selectedChapter < selectedBook.chapters.length ? <a href={chapterHref(selectedBook.id, selectedChapter + 1)}>{t.nextChapter} →</a> : <span />}
+            </div>}
           </div>
           {result.type === 'words' && result.pages > 1 && <nav className="bible-pagination" aria-label={t.results}>
             {result.page > 1 ? <a href={pageHref(result.page - 1)}>← {t.previous}</a> : <span />}
@@ -106,10 +112,11 @@ export default async function GospelPage({ searchParams }) {
       </section>
     </div>
     <footer className="bible-license"><details><summary>{t.licenses}</summary>
-      <p>KJV: King James Version. Text supplied by <a href="https://ebible.org/eng-kjv/copyright.htm">eBible.org / CrossWire Bible Society</a>. Public domain outside the United Kingdom; Crown rights apply in the UK.</p>
-      <p>Reina-Valera 1909 (RV1909) · Dominio público / Public domain. <a href="https://open.bible/bibles/reina-valera-1909">Sociedades Bíblicas Unidas · Open.Bible</a>.</p>
+      <p>Berean Standard Bible (BSB) · Public domain / Dominio público. <a href="https://berean.bible/terms.htm">Berean Bible · 3rd Printing</a>.</p>
+      <p>La Biblia en Español Sencillo (BES) · Segunda Edición (2026). Dominio público / Public domain. Irma Flores · <a href="https://audiobiblia.org/spabes_ab/spabes.htm">AudioBiblia.org</a> · <a href="https://ebible.org/spabes/copyright.htm">eBible.org</a>.</p>
       <p>{t.format}</p>
     </details></footer>
     <script src="/gospel-reader.js" defer />
+    <script src="/gospel-share.js" defer />
   </div>
 }

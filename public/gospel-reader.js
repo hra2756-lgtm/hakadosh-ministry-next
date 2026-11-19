@@ -16,7 +16,7 @@
   if (!container || !tools || tools.dataset.ready) return
   tools.dataset.ready = 'true'
   tools.hidden = false
-  const key = container.dataset.language === 'es' ? 'hakadosh-bible-highlights-v2-rv1909' : 'hakadosh-bible-highlights-v1-en'
+  const key = container.dataset.language === 'es' ? 'hakadosh-bible-highlights-v3-bes-2026' : 'hakadosh-bible-highlights-v3-bsb'
   const status = tools.querySelector('[data-highlight-status]')
   const elements = [...container.querySelectorAll('[data-verse-text]')]
   const originals = new Map(elements.map(el => [el.dataset.verseText, el.textContent]))

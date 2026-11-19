@@ -77,3 +77,16 @@
 .blog-share-actions a:hover,.blog-share-actions button:hover{background:var(--ministry-navy-hover);}
 .blog-share{border-color:var(--ministry-border);}
 @media(max-width:640px){.blog-prose{padding:24px 20px;}.blog-article .blog-heading,.blog-article>.blog-share{padding:24px 20px;}}
+
+.blog-prose .blog-highlight{background:#e6c76b;color:#29251d;padding:.06em .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.blog-prose .blog-gold-underline{text-decoration-color:#ad8117;text-decoration-thickness:2px;text-underline-offset:.2em;text-shadow:0 0 6px #d4a72cb3,0 0 12px #e6c76b66;}
+.blog-scripture-quote{margin:-.4em 0 1.6em;padding:24px;background:var(--ministry-navy);color:var(--ministry-paper);border:1px solid var(--ministry-border);border-radius:14px;}
+.blog-scripture-caption{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;font-size:.9em;}
+.blog-scripture-caption span{font:700 .75rem Arial,sans-serif;letter-spacing:.08em;border:1px solid var(--ministry-border);border-radius:20px;padding:3px 10px;}
+.blog-prose .blog-scripture-quote a{color:var(--ministry-gold);}
+.blog-prose .blog-scripture-quote a:hover{color:#fff0b5;}
+.blog-prose .blog-scripture-quote blockquote{background:none;color:var(--ministry-paper);border:0;padding:0;margin:18px 0;font-family:Georgia,serif;}
+.blog-prose .blog-scripture-quote p{margin:0 0 .65em;}
+.blog-scripture-quote sup{font:700 .7em Arial,sans-serif;color:var(--ministry-gold);margin-right:.2em;}
+.blog-scripture-read{font-size:.85em;}
+@media(max-width:640px){.blog-scripture-quote{padding:18px;}}

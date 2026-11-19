@@ -41,6 +41,7 @@ export function localizePost(post, language = 'en', config = blogConfig()) {
     title: post.title[contentLanguage].slice(0, 180),
     excerpt: (post.excerpt?.[contentLanguage] || plain).slice(0, 300),
     body, publishedAt: post.publishedAt,
+    automaticScriptureQuotes: post.automaticScriptureQuotes !== false,
     category: ['faith', 'prayer', 'testimony'].includes(post.category) ? post.category : 'reflection',
     image: imageUrl(post.image?.asset, config),
     alt: post.image?.alt?.[contentLanguage] || '',
@@ -49,7 +50,7 @@ export function localizePost(post, language = 'en', config = blogConfig()) {
 }
 
 const filter = `_type == "post" && !(_id in path("drafts.**")) && !(_id in path("versions.**")) && defined(slug.current) && defined(publishedAt) && ((defined(title.en) && count(body.en) > 0) || (defined(title.es) && count(body.es) > 0))`
-const projection = '{_id,"slug":slug.current,title,excerpt,body,publishedAt,category,image,videoUrl}'
+const projection = '{_id,"slug":slug.current,title,excerpt,body,publishedAt,category,image,videoUrl,automaticScriptureQuotes}'
 
 export function listQuery(page) {
   const start = (page - 1) * BLOG_PAGE_SIZE

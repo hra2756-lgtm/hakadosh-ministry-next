@@ -13,7 +13,7 @@ export const translations = {
     pages: {
       gospel: {
         title: 'Abide in His Word',
-        description: 'Read and search the complete Bible in English (KJV) and Spanish (Reina-Valera 1909). Explore books, chapters, and verses.',
+        description: 'Read and search the complete Bible in English (BSB) and Spanish (La Biblia en Español Sencillo). Explore books, chapters, and verses.',
         body: 'We have created the Gospel page and connected it to the navigation. Later, we can add scripture, teaching, calls to action, and any design direction you want here.',
       },
       music: {
@@ -63,8 +63,11 @@ export const translations = {
       },
     },
     youtube: {
-      subtitle: 'The place where you can reconcile your relationship with Jesus Christ',
-      videos: 'Full videos', shorts: 'Shorts', latest: 'Newest first',
+      subtitle: 'Hakadosh Ministry is the place where you can reconcile your relationship with Jesus Christ',
+      videos: 'Videos', shorts: 'Shorts', latest: 'Newest first',
+      channelNames: { en: 'Hakadosh Ministry English', es: 'Hakadosh Ministry Spanish' },
+      subscribers: 'subscribers', videoCount: 'videos', subscribe: 'Subscribe',
+      queue: 'Playlist', playing: 'Selected video', statisticsUnavailable: 'Channel statistics are temporarily unavailable.',
       channels: { en: 'Visit English Channel', es: 'Visit Spanish Channel' },
       playlist: 'View playlist on YouTube', more: 'Show more',
       watch: 'Watch video', close: 'Close player', youtube: 'Watch on YouTube',
@@ -84,7 +87,7 @@ export const translations = {
     pages: {
       gospel: {
         title: 'Permanece en su Palabra',
-        description: 'Lee y busca en la Biblia completa en inglés (KJV) y español (Reina-Valera 1909). Explora libros, capítulos y versículos.',
+        description: 'Lee y busca en la Biblia completa en inglés (BSB) y español (La Biblia en Español Sencillo). Explora libros, capítulos y versículos.',
         body: 'Hemos creado la página del Evangelio y la hemos conectado al menú de navegación. Más adelante podremos añadir pasajes bíblicos, enseñanzas, invitaciones a participar y el diseño que desees.',
       },
       music: {
@@ -134,8 +137,11 @@ export const translations = {
       },
     },
     youtube: {
-      subtitle: 'El lugar donde puedes reconciliar tu relación con Cristo Jesús',
-      videos: 'Videos completos', shorts: 'Shorts', latest: 'Más recientes primero',
+      subtitle: 'Hakadosh Ministry es el lugar donde puedes reconciliar tu relación con Cristo Jesús',
+      videos: 'Videos', shorts: 'Shorts', latest: 'Más recientes primero',
+      channelNames: { en: 'Hakadosh Ministry Inglés', es: 'Hakadosh Ministry Español' },
+      subscribers: 'suscriptores', videoCount: 'videos', subscribe: 'Suscribirse',
+      queue: 'Lista de reproducción', playing: 'Video seleccionado', statisticsUnavailable: 'Las estadísticas del canal no están disponibles por el momento.',
       channels: { en: 'Visitar el canal en inglés', es: 'Visitar el canal en español' },
       playlist: 'Ver lista de reproducción en YouTube', more: 'Mostrar más',
       watch: 'Ver video', close: 'Cerrar reproductor', youtube: 'Ver en YouTube',
