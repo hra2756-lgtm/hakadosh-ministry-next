@@ -37,7 +37,7 @@ export default async function PostPage({ params }) {
       {post.language !== language && <p className="blog-language-note">{text.fallback}</p>}
     </header>
     <BlogImage post={post} priority />
-    <div lang={post.language}><BlogBody blocks={post.body} language={post.language} automaticScriptureQuotes={post.automaticScriptureQuotes} /></div>
+    <div lang={post.language}><BlogBody blocks={post.body} language={post.language} /></div>
     {post.video && <p className="blog-video"><a className="hero-button hero-button-secondary" href={post.video} target="_blank" rel="noopener noreferrer">{text.video} ↗</a></p>}
     <BlogActions post={post} text={text} />
   </article>
