@@ -71,3 +71,29 @@ export function scriptureQuotations(block, language = 'en') {
     return [{ href: segment.href, reference: query, rows: result.rows }]
   })
 }
+
+// The author explicitly starts the final quotation section with a heading.
+// Join spans before matching: pasted posts may be one block with soft newlines.
+export function postScriptureQuotations(blocks, language = 'en') {
+  const text = blocks.filter(block => block._type === 'block').map(block =>
+    (block.children || []).map(child => child._type === 'span' ? child.text || '' : '\n').join('')
+  ).join('\n')
+  const heading = /^[\t ]*(?:Scriptures|Escrituras)[\t ]*:/im.exec(text)
+  if (!heading) return []
+  const section = text.slice(heading.index + heading[0].length)
+  const seen = new Set()
+  const quotes = []
+  let verses = 0
+  for (const link of findScriptureLinks(section, language)) {
+    const query = new URL(link.href, 'https://local.invalid').searchParams.get('q')
+    const result = searchBible(query, language)
+    if (result.type !== 'passage' || result.selections.some(s => s.end === Infinity)) continue
+    const key = result.rows.map(row => row.key).join(',')
+    if (seen.has(key)) continue
+    if (quotes.length >= 20 || verses + result.rows.length > 500) break
+    seen.add(key)
+    verses += result.rows.length
+    quotes.push({ href: link.href, reference: query, rows: result.rows })
+  }
+  return quotes
+}

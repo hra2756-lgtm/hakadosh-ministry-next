@@ -137,17 +137,8 @@ This local integration is **not** a completed production rollout.
 
 - On the local Studio, select the **Development (Testing)** workspace. The hosted
   Studio will gain these controls only when its updated code is deployed.
-- **Automatic Scripture quotations / Citas bíblicas automáticas** defaults to on
-  for both new and existing posts. Set it to off and publish to suppress generated
-  quotations for that post, in both languages; Scripture links remain active.
-- Put a reference on its own paragraph, for example `Psalm 23:1–2` or
-  `Salmo 23:1–2`. Multiple references and references split across bold/italic
-  formatting work. The website renders exact BSB / BES verses below that
-  paragraph using the post's actual content language, including language fallback.
-- This does not modify the saved Sanity body or automatically translate prose.
-  References inside sentences, chapter-only references (`Psalm 91`), manually
-  linked references, and blockquotes stay links without generated quotations.
-  Existing posts with separately written quotations can opt out to avoid duplicates.
+- Add a line starting with **Scriptures:** or **Escrituras:** near the end. References after that heading generate BSB/BES quotations at the end of the post, including soft line breaks within a single pasted block. The colon is required.
+- Scripture links remain active throughout the body. Chapter-only references remain links. There is no per-post toggle; old stored toggle values are ignored. Saved author text is not modified.
 - Select words in either language's body editor and choose **Gold highlight** or
   **Golden underline**. Highlights use a gold background; underlines have a static
   gold glow. They can be combined with bold, italic, and inline quotations.
@@ -169,3 +160,7 @@ Official references:
 - https://www.sanity.io/docs/next-js-quickstart
 - https://www.sanity.io/docs/content-lake/keeping-your-data-safe
 - https://www.sanity.io/docs/content-lake/exporting-data
+
+## Scripture section update
+
+Automatic quotations now appear at the end only for references after a line beginning `Scriptures:` or `Escrituras:` (case-insensitive, colon required). Soft line breaks and headings split across formatted spans work. References elsewhere stay clickable without quotations. Chapter-only references remain links. The old per-post boolean is ignored and removed from the Studio form; existing document values require no migration. Up to 20 unique passages / 500 verses are expanded per post.
