@@ -1,20 +1,47 @@
 {
   "en": {
-    "source": "https://ebible.org/Scriptures/eng-kjv_usfx.zip",
-    "sha256": "0f0df18d7fe9f6f9c27c5028b8af656971941fa8d34a5473830c5d2c40df6fdd",
+    "sha256": "f5d9424c5e3c97db2497219343748d9d27f8c5b72ceb5017b2a0fbbb6bd6ace1",
+    "books": 66,
+    "chapters": 1189,
+    "segments": 31086,
+    "omittedMainTextPositions": [
+      "ACT.15.34",
+      "ACT.24.7",
+      "ACT.28.29",
+      "ACT.8.37",
+      "JHN.5.4",
+      "LUK.17.36",
+      "LUK.23.17",
+      "MAT.17.21",
+      "MAT.18.11",
+      "MAT.23.14",
+      "MRK.11.26",
+      "MRK.15.28",
+      "MRK.7.16",
+      "MRK.9.44",
+      "MRK.9.46",
+      "ROM.16.24"
+    ],
+    "edition": "Berean Standard Bible",
+    "abbreviation": "BSB",
+    "revision": "3rd Printing",
+    "source": "https://berean.bible/downloads.htm",
+    "download": "https://bereanbible.com/bsb_usx.zip",
+    "license": "Public domain",
+    "licenseUrl": "https://berean.bible/terms.htm"
+  },
+  "es": {
+    "sha256": "d2843552b3e87df0b211d2c7136f0879fca8046fe7741ab0aacf34538d42f671",
     "books": 66,
     "chapters": 1189,
     "segments": 31102,
-    "coveredVerses": 31102
-  },
-  "es": {
-    "source": "https://open.bible/bibles/reina-valera-1909",
-    "download": "https://api.open.bible/artifactContent/67c4a8cf-fa7c-487d-aa83-a9ba5bac4f4d",
-    "provider": "United Bible Societies",
-    "revision": 10,
-    "sha256": "e5815e210cc424f240ee8b4e264740d8dff2a7533c4d022f1d73a3849863980e",
-    "books": 66,
-    "chapters": 1189,
-    "segments": 31102
+    "omittedMainTextPositions": [],
+    "edition": "La Biblia en Español Sencillo",
+    "abbreviation": "BES",
+    "revision": "Segunda Edición (2026)",
+    "source": "https://audiobiblia.org/spabes_ab/spabes.htm",
+    "download": "https://ebible.org/Scriptures/spabes_usfx.zip",
+    "license": "Public domain",
+    "licenseUrl": "https://ebible.org/spabes/copyright.htm"
   }
 }

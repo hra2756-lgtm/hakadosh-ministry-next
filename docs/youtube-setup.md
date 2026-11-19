@@ -1,9 +1,10 @@
 # YouTube galleries
 
-The `test` branch is for review; `main` is production. The navigation starts with
-Youtube Spanish and ends with Youtube English. Each page shows full videos on
-the left and Shorts on the right, newest publication date first. On phones the
-columns stack, with full videos first.
+The `test` branch is for review; `main` is production. One YouTube navigation item
+opens the channel matching the selected site language. Both routes remain usable.
+Each page shows a channel profile, Videos / Shorts selectors, and a Subscribe link.
+The selected video occupies the main player and a newest-first queue sits to its
+right. On phones the queue stacks below the player.
 
 ## Run locally on Windows
 
@@ -51,10 +52,26 @@ still link to YouTube.
 Public metadata is cached for one hour and refreshed when requested after that
 interval. The first request during refresh may see the previous result. Cached
 data older than 24 hours is not shown during an outage. API errors produce a
-friendly message with playlist links. Each column initially shows six items;
-Show more adds six independently. A player loads when opened and stops when
-closed. The API key stays on the server; Google requests send it in a header,
-and only sanitized public results are cached.
+friendly message with playlist links. Each selected playlist shows every eligible
+video in a scrollable queue. Videos is the default; switching to Shorts selects
+its newest upload. Selecting a queue entry updates the single player and stops
+the previous video. There is no autoplay or shuffle. Queue links also work with
+JavaScript disabled by navigating to the selected video; Watch on YouTube is
+always available. Direct selection uses `?playlist=shorts&v=VIDEO_ID`; an unknown
+video ID falls back to the newest eligible video. Selecting another playlist
+resets to its newest item.
+
+Channel subscriber and public-video counts come from `channels.list` statistics,
+cached with the same one-hour refresh and 24-hour expiry. YouTube rounds subscriber
+counts; hidden or missing counts are omitted, not invented as zero. Channel video
+totals include public videos outside the curated playlists. Thumbnail duration
+badges come from `videos.list` contentDetails. No new key or permissions are needed.
+Channel links open the matching handle; Subscribe opens YouTube's confirmation
+link (the visitor still confirms their own subscription there).
+
+A player connects to YouTube only after opening it or selecting a queue item.
+The API key stays on the server; Google requests send it in a header, and only
+sanitized public results are cached. The existing CSP remains unchanged.
 
 ## Verification
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { fetchPlaylistVideos, visibleCount } from '../src/lib/youtube-data.mjs'
+import { fetchPlaylistVideos, visibleCount, fetchChannelStatistics, durationLabel } from '../src/lib/youtube-data.mjs'
 
 const id = n => String(n).padStart(11, '0')
 const video = (n, date, options = {}) => ({
@@ -70,4 +70,24 @@ test('visible counts reject malformed query parameters and clamp to the availabl
   assert.equal(visibleCount('12', 20), 12)
   assert.equal(visibleCount('500', 20), 20)
   assert.equal(visibleCount('6', 0), 0)
+})
+
+test('channel counts come from the requested channel, respect hidden subscribers and never include credentials', async () => {
+  const load = statistics => fetchChannelStatistics({ channelId: 'my-channel', apiKey: 'secret', fetchImpl: async (url, options) => {
+    assert.equal(url.pathname, '/youtube/v3/channels')
+    assert.equal(url.searchParams.get('id'), 'my-channel')
+    assert.equal(url.searchParams.get('part'), 'statistics')
+    assert.equal(options.headers['X-Goog-Api-Key'], 'secret')
+    assert.ok(!url.href.includes('secret'))
+    return { ok: true, json: async () => ({ items: [{ id: 'my-channel', statistics }] }) }
+  } })
+  assert.deepEqual(await load({ subscriberCount: '18', videoCount: '59', hiddenSubscriberCount: false }), { subscribers: 18, videos: 59 })
+  assert.deepEqual(await load({ subscriberCount: '18', videoCount: '0', hiddenSubscriberCount: true }), { subscribers: null, videos: 0 })
+  assert.deepEqual(await load({ subscriberCount: '-1', videoCount: 'not-a-count' }), { subscribers: null, videos: null })
+  await assert.rejects(fetchChannelStatistics({ channelId: 'c', apiKey: 'secret', fetchImpl: async () => { throw new Error('private secret') } }), { message: 'YOUTUBE_UNAVAILABLE' })
+  await assert.rejects(fetchChannelStatistics({ channelId: 'c', apiKey: 'secret', fetchImpl: async () => ({ ok: true, json: async () => ({ items: [{ id: 'wrong', statistics: {} }] }) }) }), { message: 'YOUTUBE_INVALID_RESPONSE' })
+})
+
+test('duration badges handle short videos, long recordings and absent live durations', () => {
+  for (const [input, expected] of [['PT45S', '0:45'], ['PT20M55S', '20:55'], ['PT1H2M3S', '1:02:03'], ['P1DT2H', '26:00:00'], ['PT0S', null], [undefined, null], ['bad', null]]) assert.equal(durationLabel(input), expected)
 })

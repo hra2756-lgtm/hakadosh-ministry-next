@@ -1,47 +1,60 @@
 # Complete Gospel reader datasets
 
-66 books (39 Old Testament + 27 New Testament), 1,189 chapters per language.
-Downloaded 2026-11-17. Archive URLs and SHA-256 digests are in `manifest.json`.
+Both editions contain 66 books (39 Old Testament + 27 New Testament) and 1,189
+chapters. Sources verified/downloaded November 18, 2026. Archive SHA-256 digests,
+edition details, source URLs, and intentional verse gaps are in `manifest.json`.
 
-- English: King James Version, supplied by eBible.org / CrossWire Bible Society.
-  https://ebible.org/eng-kjv/copyright.htm
-  Public domain outside the UK; Crown rights apply in the UK. Original source
-  notice retained in `en-source-license.html`.
-- Spanish: **Reina-Valera 1909 (RV1909)**, public domain.
-  United Bible Societies, revision 10, supplied through Open.Bible:
-  https://open.bible/bibles/reina-valera-1909
-  The source archive's license metadata is retained in `es-source-license.xml`.
-  This is RV1909, not RVA-2015. Original Spanish spelling is retained.
+- **Berean Standard Bible (BSB), 3rd Printing.** The publisher dedicated the
+  translation to the public domain on April 30, 2023:
+  https://berean.bible/terms.htm . Official USX download:
+  https://bereanbible.com/bsb_usx.zip . The downloaded terms page is retained in
+  `en-source-license.html`.
+- **La Biblia en Español Sencillo (BES), Segunda Edición (2026).** Irma Flores,
+  AudioBiblia.org. The publisher explicitly places text and audio in the public
+  domain: https://audiobiblia.org/spabes_ab/spabes.htm . Distributed as USFX by
+  https://ebible.org/Scriptures/spabes_usfx.zip . Its public-domain notice is
+  retained in `es-source-license.html`:
+  https://ebible.org/spabes/copyright.htm . This is BES, not NBV, NVI, or RV1909.
 
-## Reader formatting and license scope
+## Faithful import and numbering
 
-English USFX and Spanish USX sources are converted to JSON by
-`scripts/build-bibles.py` (Python stdlib).
-The reader preserves verse wording and individual numbering, normalizes XML whitespace,
-and omits paragraph symbols, notes, book/section headings, Psalm titles, cross-references, Strong's
-annotations, and typography. These are reader-formatting changes, not a new
-translation. Footnote callers are also removed, including the source's inline
-`fm` marker in 3 John 1:14. Spanish public-domain text has no license fee.
-Source archives are kept outside the repository; there is no runtime API call.
+`scripts/build-bibles.py` uses only Python's standard library. It preserves the
+published verse wording and numbering and normalizes XML whitespace. Editorial
+book/section headings, cross-references, notes, Strong's metadata, speaker labels,
+and alphabetic acrostic headings are not rendered. BSB superscriptions inside
+numbered verses are retained; BES's unnumbered Psalm titles are separate in its
+source and are not imported as verses. Poetry becomes ordinary verse paragraphs.
+No text is translated, paraphrased, or supplied from a different edition.
 
-Rebuild from downloaded archives:
+BSB has **31,086 main-text verses**. Its publisher places 16 traditional positions
+in footnotes instead of the main text; these positions are explicitly enumerated
+and checked in the importer and manifest. The reader retains those numbering gaps
+and does not invent verses to fill them. BES has **31,102 individual verses**.
+Neither imported edition combines verse markers into bridges.
+
+Both use matching chapter/verse numbering. The daily pool has **31,086 pairs**,
+one complete verse in each language, spanning all 66 books. The previous
+KJV/RV1909 chapter-boundary adjustments no longer apply. The Eastern-time daily
+seed is unchanged. Each daily card links to exactly the text displayed.
+
+Search, automatic blog quotations, share-page metadata, and generated images all
+read the same datasets. Images use edition-specific cache URLs. Highlight storage
+keys changed for both languages to prevent old character offsets being applied
+to different text. `book-aliases.json` preserves prior edition names/abbreviations
+for existing searches and blog references; display names come from the new source.
+
+## Reproduce
+
+Download the two archives and BSB terms page, then run:
 
 ```powershell
-python scripts/build-bibles.py path/to/eng-kjv.zip path/to/rv1909-usx.zip
+python scripts/build-bibles.py path/to/bsb_usx.zip path/to/spabes_usfx.zip path/to/bsb-terms.html
+npm.cmd run test:bible
 ```
 
-KJV source also contains apocrypha; the converter selects the 66-book canon
-shared with RV1909. Both have 31,102 individually numbered verses, although
-some chapter/verse boundaries differ. `src/lib/bible-alignment.mjs` maps these
-differences without changing either text or the reader's original numbering.
-The daily pool contains 31,084 complete one-to-one verse pairs from all 66 books.
-Unequal groups (one English verse corresponding to two Spanish verses, or vice
-versa) remain in the reader but are excluded from daily selection to avoid joining
-verses. The existing Eastern-time date seed is preserved.
+Both sources are fully validated before either output is written. Future source
+changes with new gaps/counts fail validation and require review. Source archives
+stay outside Git; there is no runtime Bible API, key, subscription, or new package.
 
-The earlier eBible RV1909 export joins some original verse endings and contains
-empty padding markers. It is not used for this complete reader; the UBS USX
-preserves those individual verses, e.g. all 38 verses in RV1909 Job 39.
-
-Legacy NT-only KJV/RV1909 files and verification scripts are retained as historical
-inputs; the homepage and reader now use these complete datasets.
+Legacy NT-only KJV/RV1909 datasets and their scripts are retained as historical
+inputs. They do not supply the active reader, homepage, blog quotations, or images.

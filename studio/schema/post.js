@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity'
 import { InlineQuote, InlineQuoteIcon } from '../components/inline-quote.js'
+import { Highlight, HighlightIcon, GoldUnderline } from '../components/text-emphasis.js'
+import { DefaultOnBoolean } from '../components/default-on-boolean.js'
 
 const localized = (name, title, type, extra = {}) => defineField({
   name, title, type: 'object',
@@ -33,6 +35,13 @@ export const post = defineType({
       ] }, initialValue: 'reflection', validation: rule => rule.required(),
     }),
     localized('excerpt', 'Short introduction / Introducción breve', 'text', { rows: 3, validation: rule => rule.max(300) }),
+    defineField({
+      name: 'automaticScriptureQuotes', type: 'boolean',
+      title: 'Automatic Scripture quotations / Citas bíblicas automáticas',
+      description: 'On by default, including existing posts. A reference-only paragraph such as Psalm 23:1–2 adds the verses below it on the website (BSB / BES). Chapter-only references remain links. Turn off if you already wrote the quotations. / Activado por defecto, también en publicaciones anteriores. Escribe solo la referencia en un párrafo para mostrar los versículos debajo. Desactívalo si ya escribiste las citas. Los enlaces se conservan.',
+      initialValue: true,
+      components: { input: DefaultOnBoolean },
+    }),
     localized('body', 'Revelation / Revelación', 'array', {
       description: 'Select words and use Inline Quote for a short quotation. Quote / Scripture styles a whole paragraph. / Selecciona palabras y usa Cita en línea para una cita breve. Quote / Scripture aplica a todo el párrafo.',
       of: [{ type: 'block', styles: [
@@ -41,6 +50,8 @@ export const post = defineType({
       ], marks: {
         decorators: [
           { title: 'Bold', value: 'strong' }, { title: 'Italic', value: 'em' },
+          { title: 'Gold highlight / Resaltado dorado', value: 'highlight', icon: HighlightIcon, component: Highlight },
+          { title: 'Golden underline / Subrayado dorado', value: 'underline', component: GoldUnderline },
           { title: 'Inline Quote / Cita en línea', value: 'inlineQuote', icon: InlineQuoteIcon, component: InlineQuote },
         ],
         annotations: [{ name: 'link', type: 'object', title: 'Link', fields: [

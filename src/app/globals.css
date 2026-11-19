@@ -557,6 +557,58 @@ body{
 #contact-form input,#contact-form select,#contact-form textarea{background:var(--ministry-input);border-color:var(--ministry-border);}
 .youtube-column-heading{background:var(--ministry-navy-deep);padding:20px;border:1px solid var(--ministry-border);border-radius:16px;}
 .youtube-close{background:var(--ministry-navy-deep);}
+
+/* Channel profile and a single selected video with its chronological queue. */
+.youtube-channel-header{max-width:1400px;margin:0 auto 36px;padding:30px;display:flex;align-items:center;gap:30px;text-align:left;background:var(--ministry-navy);border:1px solid var(--ministry-border);border-radius:22px;}
+.youtube-channel-logo{flex:0 0 160px;align-self:flex-start;border-radius:50%;overflow:hidden;}
+.youtube-channel-logo img{display:block;width:100%;height:auto;}
+.youtube-channel-copy{min-width:0;}
+.youtube-channel-copy h1{font-size:clamp(1.6rem,3vw,2.5rem);line-height:1.2;margin:0 0 12px;}
+.youtube-channel-copy h1 a{color:var(--ministry-paper);text-decoration:none;}
+.youtube-channel-copy h1 a:hover{color:var(--ministry-gold);}
+.youtube-channel-meta{display:flex;flex-wrap:wrap;gap:6px 12px;color:#c9c3b4;font-size:.9rem;}
+.youtube-channel-meta span:not(:first-child)::before{content:'·';margin-right:12px;color:var(--ministry-gold);}
+.youtube-channel-meta span:first-child{font-weight:700;color:var(--ministry-paper);}
+.youtube-channel-description{line-height:1.65;margin:14px 0 10px;color:var(--ministry-paper);}
+.youtube-channel-url{color:var(--ministry-gold);font-size:.92rem;text-underline-offset:4px;overflow-wrap:anywhere;}
+.youtube-channel-header .youtube-channel-actions{justify-content:flex-start;gap:12px;margin-top:22px;}
+.youtube-channel-actions .hero-button{padding:12px 24px;min-height:44px;}
+.youtube-statistics-note{color:#c9c3b4;font-size:.85rem;margin-top:10px;}
+.youtube-watch-layout{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:minmax(0,2.2fr) minmax(310px,1fr);align-items:start;gap:24px;text-align:left;scroll-margin-top:20px;}
+.youtube-featured{min-width:0;overflow:hidden;border:1px solid var(--ministry-border);border-radius:18px;background:var(--ministry-navy);}
+.youtube-featured [hidden]{display:none!important;}
+.youtube-featured .youtube-preview{aspect-ratio:16/9;}
+.youtube-featured .youtube-player iframe{aspect-ratio:16/9;min-height:0;}
+.youtube-watch-shorts .youtube-featured .youtube-preview,.youtube-watch-shorts .youtube-featured .youtube-player iframe{aspect-ratio:auto;height:min(70vh,720px);min-height:360px;background:#080808;}
+.youtube-watch-shorts .youtube-preview img{width:min(100%,calc(min(70vh,720px)*9/16));margin:auto;object-fit:cover;}
+.youtube-featured-copy{padding:22px 24px;}
+.youtube-featured-copy h2{font-size:1.25rem;line-height:1.45;color:var(--ministry-paper);margin-bottom:12px;overflow-wrap:anywhere;}
+.youtube-featured-copy time{display:block;color:#c9c3b4;font-size:.9rem;margin-bottom:14px;}
+.youtube-featured-copy>a{color:var(--ministry-gold);font-size:.9rem;text-underline-offset:4px;}
+.youtube-queue{min-width:0;border:1px solid var(--ministry-border);border-radius:18px;overflow:hidden;background:var(--ministry-navy-deep);}
+.youtube-queue-heading{padding:20px;border-bottom:1px solid #a48c5066;}
+.youtube-queue-heading h2{font-size:1.25rem;color:var(--ministry-paper);margin-bottom:8px;}
+.youtube-queue-heading p{font-size:.8rem;color:#c9c3b4;line-height:1.5;}
+.youtube-queue-heading>span{display:block;color:var(--ministry-gold);font-size:.75rem;margin-top:8px;}
+.youtube-queue-list{list-style:none;padding:6px 0;margin:0;max-height:540px;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:#a48c50 #101d30;}
+.youtube-queue-item{display:grid;grid-template-columns:18px 112px minmax(0,1fr);gap:8px;align-items:center;padding:12px 10px;color:var(--ministry-paper);text-decoration:none;border-left:3px solid transparent;}
+.youtube-queue-item:hover{background:var(--ministry-navy-hover);}
+.youtube-queue-item[aria-current]{background:#263950;border-left-color:var(--ministry-gold);}
+.youtube-queue-number{font-size:.75rem;text-align:center;color:#c9c3b4;}
+.youtube-queue-item[aria-current] .youtube-queue-number{font-size:0;}
+.youtube-queue-item[aria-current] .youtube-queue-number::after{content:'▶';font-size:.75rem;color:var(--ministry-gold);}
+.youtube-queue-thumbnail{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#080808;}
+.youtube-queue-thumbnail img{display:block;width:100%;height:100%;object-fit:cover;}
+.youtube-queue-thumbnail>span{position:absolute;right:3px;bottom:3px;background:#000d;color:#fff;border-radius:3px;padding:2px 3px;font-size:.65rem;}
+.youtube-queue-copy{min-width:0;}
+.youtube-queue-copy strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.83rem;line-height:1.4;overflow-wrap:anywhere;}
+.youtube-queue-copy>span,.youtube-queue-copy time{display:block;color:#c9c3b4;font-size:.68rem;line-height:1.4;margin-top:5px;}
+.youtube-queue .youtube-playlist-link{margin:0;padding:16px 20px;border-top:1px solid #a48c5066;font-size:.8rem;}
+.youtube-empty-playlist{max-width:1400px;margin:auto;}
+.youtube-shell .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0;}
+@media(max-width:1000px){.youtube-watch-layout{grid-template-columns:minmax(0,1fr);}.youtube-queue-list{max-height:420px;}.youtube-queue-item{grid-template-columns:24px 150px minmax(0,1fr);}.youtube-queue-copy strong{font-size:.95rem;}.youtube-queue-copy>span,.youtube-queue-copy time{font-size:.8rem;}}
+@media(max-width:640px){.youtube-channel-header{padding:22px 18px;gap:18px;flex-direction:column;}.youtube-channel-logo{flex-basis:auto;width:96px;}.youtube-channel-actions .hero-button{padding:11px 17px;}.youtube-channel-header .youtube-channel-actions{gap:8px;}.youtube-queue-item{grid-template-columns:16px 100px minmax(0,1fr);gap:6px;padding:10px 6px;}.youtube-queue-copy strong{font-size:.83rem;}.youtube-queue-copy>span,.youtube-queue-copy time{font-size:.68rem;}.youtube-featured-copy{padding:18px;}}
+@media(max-width:640px){.youtube-watch-shorts .youtube-featured .youtube-preview,.youtube-watch-shorts .youtube-featured .youtube-player iframe{height:auto;min-height:0;aspect-ratio:9/16;}.youtube-watch-shorts .youtube-preview img{width:100%;}}
 @media(max-width:1000px) and (min-width:561px){
   .site-title{font-size:clamp(1.25rem,3vw,2rem);padding:0 165px 0 95px;}
   .site-home-link{padding:12px 18px;}

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { findBook, searchBible } from '../../../lib/bible.mjs'
+import { findBook, searchBible, MAX_BIBLE_QUERY_LENGTH } from '../../../lib/bible.mjs'
 import { LANGUAGE_COOKIE, normalizeLanguage } from '../../../lib/translations.mjs'
 
 // A normal link (never prefetched) sets the language of the daily verse or post.
@@ -11,7 +11,7 @@ export function GET(request) {
   const chapter = params.get('chapter') || ''
   const verse = params.get('verse') || ''
   const explicitQuery = params.get('q') || ''
-  const query = explicitQuery ? (explicitQuery.length <= 240 ? explicitQuery : '') : book && /^\d{1,3}$/.test(chapter) && /^\d{1,3}(?:-\d{1,3})?$/.test(verse) ? `${book.id} ${chapter}:${verse}` : ''
+  const query = explicitQuery ? (explicitQuery.length <= MAX_BIBLE_QUERY_LENGTH ? explicitQuery : '') : book && /^\d{1,3}$/.test(chapter) && /^\d{1,3}(?:-\d{1,3})?$/.test(verse) ? `${book.id} ${chapter}:${verse}` : ''
   const valid = query && searchBible(query, language).type === 'passage'
   const destination = new URL('/gospel', request.url)
   if (valid) destination.searchParams.set('q', query)

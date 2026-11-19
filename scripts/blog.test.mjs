@@ -41,6 +41,14 @@ test('drafts, release versions, unsafe slugs and incomplete content cannot rende
   assert.equal(localizePost({ ...post, title: { ...post.title, es: 'Un nuevo día' }, body: { en: body, es: body } }, 'es', config).language, 'es')
 })
 
+test('Scripture quotations default on for existing posts and respect an explicit per-post opt-out', () => {
+  assert.equal(localizePost(post).automaticScriptureQuotes, true)
+  assert.equal(localizePost({ ...post, automaticScriptureQuotes: false }).automaticScriptureQuotes, false)
+  assert.equal(localizePost({ ...post, automaticScriptureQuotes: true }).automaticScriptureQuotes, true)
+  assert.ok(postQuery(post.slug).query.includes('automaticScriptureQuotes'))
+  assert.ok(listQuery(1).query.includes('automaticScriptureQuotes'))
+})
+
 test('links and images cannot introduce executable URLs or arbitrary media origins', () => {
   for (const value of ['javascript:alert(1)', 'data:text/html,test', '//evil.example', 'http://example.com', 'https://user:password@example.com']) assert.equal(safeHttpsUrl(value), null)
   assert.equal(youtubeUrl('https://youtube.com.evil.example/watch?v=123'), null)

@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { findScriptureLinks, scriptureSegments } from '../src/lib/scripture-links.mjs'
+import { findScriptureLinks, scriptureSegments, scriptureQuotations } from '../src/lib/scripture-links.mjs'
 import { bibles, searchBible } from '../src/lib/bible.mjs'
 
 const queries = (text, language) => findScriptureLinks(text, language).map(link => new URL(link.href, 'https://example.test').searchParams.get('q'))
@@ -33,6 +33,23 @@ test('invalid and uncertain references stay plain text; URLs are not rewritten',
   }
 })
 
+test('chapter headings before quotations link without consuming the colon or formatting', () => {
+  for (const [language, name, rest] of [['en', 'Psalm', '\nHe who dwells'], ['es', 'Salmo', ']\nEl que habita']]) {
+    const heading = `${name} 91`
+    const block = { children: [span(`${heading}: `, ['strong', 'inlineQuote']), span(rest)] }
+    const segments = scriptureSegments(block, language)
+    const linked = segments.filter(segment => segment.href)
+    assert.equal(linked.length, 1)
+    assert.equal(linked[0].children.map(child => child.text).join(''), heading)
+    const params = new URL(linked[0].href, 'https://example.test').searchParams
+    assert.equal(params.get('lang'), language)
+    assert.equal(searchBible(params.get('q'), language).rows.length, 16)
+    assert.equal(segments.flatMap(segment => segment.children).map(child => child.text).join(''), `${heading}: ${rest}`)
+  }
+  assert.deepEqual(queries('Psalm 91:'), ['Psalm 91'])
+  for (const text of ['Psalm 91:999', 'Psalm 91: 999', 'Psalm 91:\n999', 'Psalm 91:16:99']) assert.deepEqual(queries(text), [], text)
+})
+
 test('references split across formatting create one link and preserve the original content', () => {
   const block = { children: [span('Read '), span('John ', ['strong']), span('3:', ['em']), span('16', ['inlineQuote']), span(' today.')] }
   const segments = scriptureSegments(block, 'es')
@@ -53,4 +70,26 @@ test('existing links and inline objects are boundaries; author data is never mut
 
 test('long prose and near-matches do not require unbounded matching', { timeout: 3000 }, () => {
   assert.equal(findScriptureLinks('John 9999999999:9999999999. '.repeat(2000)).length, 0)
+})
+
+test('reference-only paragraphs quote exact local text, ranges and formatted references in both languages', () => {
+  for (const [language, query] of [['en', 'Psalm 23:1-2'], ['es', 'Salmo 23:1–2'], ['en', 'John 3:36–4:2'], ['es', 'Juan 3:16, 18']]) {
+    const block = { _type: 'block', children: [span(query.slice(0, 3), ['strong']), span(query.slice(3), ['highlight'])] }
+    const original = structuredClone(block)
+    const quotes = scriptureQuotations(block, language)
+    assert.equal(quotes.length, 1)
+    assert.deepEqual(quotes[0].rows, searchBible(query, language).rows)
+    assert.deepEqual(block, original)
+  }
+  const block = { _type: 'block', children: [span('(John 3:16); Romans 8:28.')] }
+  assert.equal(scriptureQuotations(block).length, 2)
+  assert.equal(scriptureQuotations({ _type: 'block', children: [span('John 3:16; John 3:16')] }).length, 1)
+})
+
+test('prose, chapter-only references, manual links and existing quotations do not auto-expand', () => {
+  for (const text of ['Psalm 91:', 'John 3', 'Read John 3:16 today.', 'John 3:16\nFor God so loved the world', 'John 3:999', '<img>John 3:16']) {
+    assert.deepEqual(scriptureQuotations({ _type: 'block', children: [span(text)] }), [], text)
+  }
+  assert.deepEqual(scriptureQuotations({ _type: 'block', style: 'blockquote', children: [span('John 3:16')] }), [])
+  assert.deepEqual(scriptureQuotations({ _type: 'block', markDefs: [{ _key: 'm', _type: 'link', href: 'https://example.com' }], children: [span('John 3:16', ['m'])] }), [])
 })

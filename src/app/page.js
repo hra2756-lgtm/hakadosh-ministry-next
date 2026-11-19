@@ -30,7 +30,7 @@ export default async function HomePage() {
             </p>
 
             <span className="hero-verse-ref">
-              {spanishVerse.reference} (RV1909)
+              {spanishVerse.reference} (BES)
             </span>
             <span className="daily-verse-read">Leer el pasaje →</span>
           </a>
@@ -43,13 +43,13 @@ export default async function HomePage() {
             </p>
 
             <span className="hero-verse-ref">
-              {verseOfTheDay.reference} (KJV)
+              {verseOfTheDay.reference} (BSB)
             </span>
             <span className="daily-verse-read">Read the passage →</span>
           </a>
         </div>
       </section>
-      <p className="daily-bible-credit">KJV · Reina-Valera 1909 · <a href="/gospel">Bible editions / Ediciones bíblicas</a></p>
+      <p className="daily-bible-credit">BSB · La Biblia en Español Sencillo · <a href="/gospel">Bible editions / Ediciones bíblicas</a></p>
     </>
   )
 }

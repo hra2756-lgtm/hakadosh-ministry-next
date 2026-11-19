@@ -6,7 +6,9 @@ const names = [...new Set([...bibleBookNames].map(normalize))].sort((a, b) => b.
 const bookPattern = names.map(name => [...name].map(char => char === ' ' ? '[ \\t]*' : accentLetters[char] || char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('')).join('|')
 const number = '\\d{1,10}'
 const unit = `${number}(?:[ \\t]*:[ \\t]*${number})?(?:[ \\t]*[-–—][ \\t]*${number}(?:[ \\t]*:[ \\t]*${number})?)?`
-const pattern = `(?<![\\p{L}\\p{N}_/])(?:${bookPattern})\\.?[ \\t]*${unit}(?:[ \\t]*[,;][ \\t]*${unit}){0,19}(?![\\p{L}\\p{N}_:]|[ \\t]*[-–—][ \\t]*\\d)`
+// A trailing colon can introduce a quotation ("Psalm 91: ..."). Leave that
+// punctuation outside the link, but never truncate a colon followed by digits.
+const pattern = `(?<![\\p{L}\\p{N}_/])(?:${bookPattern})\\.?[ \\t]*${unit}(?:[ \\t]*[,;][ \\t]*${unit}){0,19}(?![\\p{L}\\p{N}_]|:\\s*\\d|[ \\t]*[-–—][ \\t]*\\d)`
 
 export function findScriptureLinks(text, language = 'en') {
   if (typeof text !== 'string') return []
@@ -46,4 +48,26 @@ export function scriptureSegments(block, language = 'en') {
   for (const link of links) { append(cursor, link.start); append(link.start, link.end, link.href); cursor = link.end }
   append(cursor, text.length)
   return segments
+}
+
+// Expand reference-only paragraphs, not passing mentions or quotations the
+// author has already written in the same paragraph. Manual links stay manual.
+export function scriptureQuotations(block, language = 'en') {
+  if (block._type !== 'block' || block.style === 'blockquote' ||
+      block.children?.some(child => child._type !== 'span')) return []
+  const segments = scriptureSegments(block, language)
+  if (segments.some(segment => !segment.href &&
+      /[^\s:;,.()[\]“”"'‘’]/u.test(segment.children.map(child => child.text).join('')))) return []
+  const seen = new Set()
+  return segments.filter(segment => segment.href).flatMap(segment => {
+    const query = new URL(segment.href, 'https://local.invalid').searchParams.get('q')
+    const result = searchBible(query, language)
+    // Chapter-only references remain links so a short mention cannot insert a
+    // whole chapter. The Bible parser also enforces valid, bounded passages.
+    if (result.type !== 'passage' || result.selections.some(selection => selection.end === Infinity)) return []
+    const key = result.rows.map(row => row.key).join(',')
+    if (seen.has(key)) return []
+    seen.add(key)
+    return [{ href: segment.href, reference: query, rows: result.rows }]
+  })
 }

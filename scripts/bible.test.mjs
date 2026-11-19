@@ -1,31 +1,36 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { bibles, dailyPassages, getDailyPassage, parseReferences, searchBible, passageHref, readablePassageQuery } from '../src/lib/bible.mjs'
-import { alignmentRules } from '../src/lib/bible-alignment.mjs'
+import manifest from '../src/data/bible/manifest.json' with { type: 'json' }
+import legacyAliases from '../src/data/bible/book-aliases.json' with { type: 'json' }
 
 test('both complete Bibles contain 66 ordered books and 1,189 populated chapters', () => {
-  for (const books of Object.values(bibles)) {
+  for (const [language, books] of Object.entries(bibles)) {
     assert.equal(books.length, 66)
     assert.equal(books[0].id, 'GEN')
     assert.equal(books[38].id, 'MAL')
     assert.equal(books[39].id, 'MAT')
     assert.equal(books[65].id, 'REV')
     assert.equal(books.reduce((n, book) => n + book.chapters.length, 0), 1189)
-    for (const book of books) for (const chapter of book.chapters) {
+    const gaps = []
+    for (const book of books) for (const [index, chapter] of book.chapters.entries()) {
       assert.ok(chapter.length)
       let previous = 0
       for (const verse of chapter) {
-        assert.equal(verse.start, previous + 1, `${book.id}: missing verse after ${previous}`)
+        assert.ok(verse.start > previous)
+        for (let v = previous + 1; v < verse.start; v++) gaps.push(`${book.id}.${index + 1}.${v}`)
+        assert.equal(verse.start, verse.end)
         previous = verse.end
         assert.ok(verse.text.trim())
         assert.doesNotMatch(verse.text, /[<>\uFFFD]/)
       }
     }
+    assert.deepEqual(gaps.sort(), manifest[language].omittedMainTextPositions)
   }
-  assert.equal(bibles.en.flatMap(b => b.chapters.flat()).length, 31102)
+  assert.equal(bibles.en.flatMap(b => b.chapters.flat()).length, 31086)
   assert.equal(bibles.es.flatMap(b => b.chapters.flat()).length, 31102)
-  assert.match(searchBible('Genesis 1:1').rows[0].text, /^In the beginning God created the heaven and the earth\.$/)
-  assert.match(searchBible('Génesis 1:1', 'es').rows[0].text, /^EN el principio crió Dios los cielos y la tierra\.$/)
+  assert.equal(searchBible('Genesis 1:1').rows[0].text, 'In the beginning God created the heavens and the earth.')
+  assert.equal(searchBible('Génesis 1:1', 'es').rows[0].text, 'Al principio Dios hizo el cielo y la tierra.')
 })
 
 test('reference search supports both languages, ranges, commas, and multiple books', () => {
@@ -46,14 +51,19 @@ test('reference search supports both languages, ranges, commas, and multiple boo
   }
 })
 
-test('RV1909 verses stay separate, including source chapter endings', () => {
+test('BES verses stay separate; BSB source gaps retain their original numbering', () => {
   const result = searchBible('Genesis 1:11,12', 'es')
   assert.equal(result.rows.length, 2)
   assert.deepEqual(result.rows.map(v => v.verse), ['11', '12'])
   assert.equal(result.rows[0].reference, 'Génesis 1:11')
-  assert.equal(searchBible('Job 39', 'es').rows.length, 38)
-  assert.equal(searchBible('Numbers 13', 'es').rows.length, 34)
-  assert.equal(searchBible('3 John 1:14', 'es').rows[0].text, 'Porque espero verte en breve, y hablaremos boca á boca.')
+  assert.equal(searchBible('Job 39', 'es').rows.length, 30)
+  assert.equal(searchBible('Numbers 13', 'es').rows.length, 33)
+  assert.equal(searchBible('3 John 1:14', 'es').rows[0].text, 'Espero verte pronto, y hablaremos cara a cara. La paz sea contigo. Los amigos te saludan. Saluda a los amigos, a cada uno por su nombre.')
+  assert.equal(searchBible('John 5:4', 'en').type, 'error')
+  assert.equal(searchBible('John 5:4', 'es').rows[0].start, 4)
+  assert.deepEqual(searchBible('John 5:3-5', 'en').rows.map(v => v.start), [3, 5])
+  assert.equal(searchBible('Psalm 23:1', 'en').rows[0].text, 'A Psalm of David. The LORD is my shepherd; I shall not want.')
+  assert.equal(searchBible('Salmo 23:1', 'es').rows[0].text, 'El Señor es mi pastor; no me faltará ningún bien.')
   for (const book of bibles.es) for (const verses of book.chapters) for (const v of verses) assert.equal(v.start, v.end)
 })
 
@@ -108,28 +118,35 @@ test('every daily passage links to the exact same displayed text in both languag
     assert.equal(url.pathname, '/gospel/open')
     assert.equal(url.searchParams.get('lang'), language)
   }
-  assert.equal(dailyPassages.length, 31084)
+  assert.equal(dailyPassages.length, 31086)
   for (const pair of dailyPassages) for (const v of Object.values(pair)) assert.match(v.verse, /^\d+$/)
-  assert.equal(dailyPassages.find(p => p.en.book === 'JON' && p.en.chapter === 1 && p.en.verse === '17').es.reference, 'Jonás 2:1')
-  assert.equal(dailyPassages.find(p => p.en.book === 'JOB' && p.en.chapter === 40 && p.en.verse === '1').es.reference, 'Job 39:34')
-  assert.equal(dailyPassages.find(p => p.en.book === '2CO' && p.en.chapter === 13 && p.en.verse === '14').es.verse, '13')
+  assert.equal(dailyPassages.find(p => p.en.book === 'JON' && p.en.chapter === 1 && p.en.verse === '17').es.reference, 'Jonás 1:17')
+  assert.equal(dailyPassages.find(p => p.en.book === 'JOB' && p.en.chapter === 40 && p.en.verse === '1').es.reference, 'Job 40:1')
+  assert.equal(dailyPassages.find(p => p.en.book === '2CO' && p.en.chapter === 13 && p.en.verse === '14').es.verse, '14')
+  for (const pair of dailyPassages) {
+    assert.equal(pair.en.chapter, pair.es.chapter)
+    assert.equal(pair.en.verse, pair.es.verse)
+  }
 })
 
-test('daily mappings plus explicitly excluded unequal groups cover both entire editions exactly once', () => {
-  for (const [language, offset] of [['en', 1], ['es', 4]]) {
+test('daily pairs cover the whole BSB and all BES positions except the 16 BSB source gaps', () => {
+  assert.equal(manifest.en.omittedMainTextPositions.length, 16)
+  for (const language of ['en', 'es']) {
     const seen = new Set(dailyPassages.map(pair => `${pair[language].book}.${pair[language].chapter}.${pair[language].verse}`))
     assert.equal(seen.size, dailyPassages.length)
-    for (const rule of alignmentRules) {
-      if (rule[3] - rule[2] === rule[6] - rule[5]) continue
-      for (let v = rule[offset + 1]; v <= rule[offset + 2]; v++) {
-        const key = `${rule[0]}.${rule[offset]}.${v}`
-        assert.ok(!seen.has(key), key)
-        seen.add(key)
-      }
+    for (const key of manifest.en.omittedMainTextPositions) {
+      assert.ok(!seen.has(key), key)
+      if (language === 'es') seen.add(key)
     }
     const all = bibles[language].flatMap(b => b.chapters.flatMap((c, i) => c.map(v => `${b.id}.${i + 1}.${v.verse}`)))
     assert.equal(seen.size, all.length)
     for (const key of all) assert.ok(seen.has(key), key)
+  }
+})
+
+test('previous edition book names and abbreviations still resolve existing links and posts', () => {
+  for (const [alias, id] of Object.entries(legacyAliases)) for (const language of ['en', 'es']) {
+    assert.equal(searchBible(`${alias} 1:1`, language).rows[0]?.book, id, alias)
   }
 })
 

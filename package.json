@@ -17,7 +17,7 @@
     "backup:blog": "node scripts/backup-blog.mjs",
     "test:backup": "node --test scripts/blog-backup.test.mjs",
     "test:blog": "node --test scripts/blog.test.mjs scripts/blog-likes.test.mjs scripts/scripture-links.test.mjs",
-    "test:bible": "node --test scripts/bible.test.mjs"
+    "test:bible": "node --test scripts/bible.test.mjs scripts/scripture-share.test.mjs"
   },
   "dependencies": {
     "next": "^16.2.0",

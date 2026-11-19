@@ -1,5 +1,6 @@
 import english from '../data/bible/en.json' with { type: 'json' }
 import spanish from '../data/bible/es.json' with { type: 'json' }
+import legacyAliases from '../data/bible/book-aliases.json' with { type: 'json' }
 import { getVerseOfTheDay } from './verse-of-the-day.js'
 import { spanishDailyReference } from './bible-alignment.mjs'
 
@@ -17,6 +18,8 @@ for (const books of Object.values(bibles)) for (const book of books) {
   for (const alias of [book.id, book.name, book.abbr, book.name.replace(/^San /, '')]) addAlias(alias, book.id)
 }
 addAlias('salmo', 'PSA')
+// Keep previously published names/abbreviations working after edition changes.
+for (const [alias, id] of Object.entries(legacyAliases)) addAlias(alias, id)
 for (const [alias, id] of Object.entries({ psalm: 'PSA', salmos: 'PSA', 'song of songs': 'SNG', 'cantar de los cantares': 'SNG', 'cantar de cantares': 'SNG', 'cantares': 'SNG', john: 'JHN', jn: 'JHN', '1 cor': '1CO', '2 cor': '2CO', '1 thes': '1TH', '2 thes': '2TH', '1 tim': '1TI', '2 tim': '2TI', '1 pet': '1PE', '2 pet': '2PE' })) addAlias(alias, id)
 const aliasList = [...aliases.keys()].sort((a, b) => b.length - a.length)
 export const findBook = (value, language = 'en') => bibles[language].find(book => book.id === aliases.get(compact(value)))
@@ -128,7 +131,7 @@ const dailyPassages = english.flatMap((book, i) => book.chapters.flatMap((verses
   if (!mapped) return []
   const [chapter, number] = mapped
   const esVerse = spanish[i].chapters[chapter - 1].find(item => item.start === number)
-  if (!esVerse) throw new Error(`Missing RV1909 daily mapping: ${book.id} ${c + 1}:${v.verse}`)
+  if (!esVerse) throw new Error(`Missing BES daily mapping: ${book.id} ${c + 1}:${v.verse}`)
   return [{ en: { book: book.id, chapter: c + 1, verse: v.verse, text: v.text, reference: reference(book, c + 1, v.verse) }, es: { book: book.id, chapter, verse: esVerse.verse, text: esVerse.text, reference: reference(spanish[i], chapter, esVerse.verse) } }]
 })))
 
