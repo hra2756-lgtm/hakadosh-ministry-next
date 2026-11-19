@@ -1,5 +1,5 @@
 import { getLanguage, getPageMetadata } from '../../lib/language'
-import { bibles, chapterHref, findBook, reference, searchBible, readablePassageQuery, MAX_BIBLE_QUERY_LENGTH } from '../../lib/bible.mjs'
+import { bibles, isNewTestament, chapterHref, findBook, reference, searchBible, readablePassageQuery, MAX_BIBLE_QUERY_LENGTH } from '../../lib/bible.mjs'
 import { gospelText } from '../../lib/gospel-translations.mjs'
 import { scriptureShare } from '../../lib/scripture-share.mjs'
 import { ScriptureShare } from '../components/scripture-share'
@@ -37,7 +37,7 @@ export default async function GospelPage({ searchParams }) {
       <p>{t.intro}</p>
       <span className="gospel-edition">{t.version}</span>
     </header>
-    <section className="bible-search-panel" aria-label={t.search}>
+    <section data-testament={isNewTestament(selectedBook.id) ? 'new' : 'old'} className="bible-search-panel" aria-label={t.search}>
       <div className="bible-search-controls">
       <form action="/gospel" method="get" className="bible-search-form" role="search">
         <label htmlFor="bible-query">{t.search}</label>
@@ -50,11 +50,11 @@ export default async function GospelPage({ searchParams }) {
         <div><label htmlFor="bible-book">{t.book}</label>
           <select id="bible-book" name="book" defaultValue={selectedBook.id}>
             {[books.slice(0, 39), books.slice(39)].map((group, i) => <optgroup key={i} label={i ? t.new : t.old}>
-              {group.map(book => <option key={book.id} value={book.id} data-chapters={book.chapters.length}>{book.name}</option>)}
+              {group.map(book => <option key={book.id} value={book.id} data-chapters={book.chapters.length} data-testament={isNewTestament(book.id) ? 'new' : 'old'}>{book.name}</option>)}
             </optgroup>)}
           </select>
         </div>
-        <div><label htmlFor="bible-chapter">{t.chapter}</label><input id="bible-chapter" type="number" name="chapter" min="1" max="150" required defaultValue={selectedChapter} /></div>
+        <div><label htmlFor="bible-chapter">{t.chapter}</label><div className="bible-chapter-picker"><input id="bible-chapter" type="number" name="chapter" min="1" max={selectedBook.chapters.length} required defaultValue={selectedChapter} /><button type="button" className="bible-chapter-toggle" hidden popoverTarget="bible-chapter-menu" aria-label={t.chapters} aria-controls="bible-chapter-menu">⌄</button><div id="bible-chapter-menu" popover="auto" role="group" aria-label={t.chapters}><div className="bible-chapter-calendar" /></div></div></div>
         <button type="submit" className="hero-button hero-button-secondary">{t.open}</button>
       </form>
       </div>
@@ -62,12 +62,12 @@ export default async function GospelPage({ searchParams }) {
     <div className="bible-layout">
       <aside className="bible-library" aria-label={t.books}>
         <h3>{t.books}</h3>
-        {[books.slice(0, 39), books.slice(39)].map((group, index) => <details key={index} open={index === (books.indexOf(selectedBook) >= 39 ? 1 : 0)}>
+        {[books.slice(0, 39), books.slice(39)].map((group, index) => <details data-testament={index ? 'new' : 'old'} key={index} open={index === (books.indexOf(selectedBook) >= 39 ? 1 : 0)}>
           <summary>{index ? t.new : t.old}<span>{group.length}</span></summary>
           <div className="bible-book-list">{group.map(book => <a href={chapterHref(book.id, 1)} key={book.id} aria-current={selectedBook.id === book.id && result.rows.length ? 'true' : undefined}>{book.name}<span>{book.chapters.length}</span></a>)}</div>
         </details>)}
       </aside>
-      <section className="bible-reading-column" aria-label={t.passages}>
+      <section data-testament={isNewTestament(selectedBook.id) ? 'new' : 'old'} className="bible-reading-column" aria-label={t.passages}>
         {result.type === 'browse' && <div className="bible-welcome">
           <span aria-hidden="true" className="bible-welcome-symbol">✦</span>
           <h3>{t.welcome}</h3><p>{t.welcomeBody}</p>
@@ -88,7 +88,7 @@ export default async function GospelPage({ searchParams }) {
             </div>
             </div>
             <div className="bible-passages" data-bible-passages data-language={language}>
-              {result.rows.map(verse => <article key={verse.key} className="bible-verse" id={`verse-${verse.key}`}>
+              {result.rows.map(verse => <article key={verse.key} data-testament={isNewTestament(verse.book) ? 'new' : 'old'} className="bible-verse" id={`verse-${verse.key}`}>
                 <a className="bible-verse-number" href={`${chapterHref(verse.book, verse.chapter)}#verse-${verse.key}`} aria-label={verse.reference}>{singleChapter ? verse.verse : verse.reference}</a>
                 <p data-verse-text={verse.key}>{verse.text}</p>
               </article>)}

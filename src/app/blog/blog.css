@@ -81,6 +81,7 @@
 .blog-prose .blog-highlight{background:#e6c76b;color:#29251d;padding:.06em .12em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
 .blog-prose .blog-gold-underline{text-decoration-color:#ad8117;text-decoration-thickness:2px;text-underline-offset:.2em;text-shadow:0 0 6px #d4a72cb3,0 0 12px #e6c76b66;}
 .blog-scripture-quote{margin:-.4em 0 1.6em;padding:24px;background:var(--ministry-navy);color:var(--ministry-paper);border:1px solid var(--ministry-border);border-radius:14px;}
+.blog-scripture-quote[data-testament="new"]{background:#421d29;}
 .blog-scripture-caption{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;font-size:.9em;}
 .blog-scripture-caption span{font:700 .75rem Arial,sans-serif;letter-spacing:.08em;border:1px solid var(--ministry-border);border-radius:20px;padding:3px 10px;}
 .blog-prose .blog-scripture-quote a{color:var(--ministry-gold);}

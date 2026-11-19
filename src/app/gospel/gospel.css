@@ -18,7 +18,8 @@
 .bible-browse-form>div:first-child{flex:1;max-width:400px;}
 .bible-browse-form select{width:100%;}
 .bible-browse-form input{width:100px;}
-.bible-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:28px;align-items:start;}
+.bible-layout{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:28px;align-items:start;}
+.bible-layout>.bible-library{order:2;}
 .bible-library{border:1px solid #403619;border-radius:16px;overflow:hidden;background:#090907;}
 .bible-library h3{font-size:.85rem;padding:22px 18px;color:#e6c76b;letter-spacing:1px;}
 .bible-library summary{cursor:pointer;color:#e1d7b3;padding:16px;font-size:.85rem;border-top:1px solid #39301a;}
@@ -28,6 +29,16 @@
 .bible-book-list a span{color:#a99e7b;font-size:.75rem;}
 .bible-book-list a:hover,.bible-book-list a[aria-current]{background:#252111;color:#f3dd89;}
 .bible-reading-column{min-width:0;}
+.bible-chapter-picker{display:flex;position:relative;}
+.bible-browse-form .bible-chapter-picker input{width:110px;padding-right:42px;appearance:textfield;}
+.bible-chapter-picker input::-webkit-inner-spin-button{appearance:none;}
+.bible-chapter-toggle{position:absolute;right:0;top:0;width:38px;height:49px;padding:0;border:0;border-radius:0 10px 10px 0;background:transparent;color:var(--ministry-gold);}
+#bible-chapter-menu{position:fixed;inset:auto;margin:0;padding:10px;width:342px;max-width:calc(100vw - 16px);max-height:330px;overflow:auto;border:2px solid var(--ministry-border);border-radius:12px;background:var(--ministry-navy);box-shadow:0 12px 32px #0008;}
+.bible-search-panel[data-testament="new"] #bible-chapter-menu{background:#421d29;}
+.bible-chapter-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.bible-chapter-calendar button{min-width:0;min-height:40px;padding:6px 0;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--ministry-paper);font:inherit;font-variant-numeric:tabular-nums;}
+.bible-chapter-calendar button:hover,.bible-chapter-calendar button:focus-visible{border-color:var(--ministry-gold);outline:2px solid var(--ministry-gold);outline-offset:-2px;}
+.bible-chapter-calendar button[aria-pressed="true"]{background:var(--ministry-gold);color:#141414;}
 .bible-welcome,.bible-reading-panel{border:1px solid #50421e;border-radius:18px;background:radial-gradient(ellipse at top,#15130b,#060606 65%);padding:32px;}
 .bible-welcome{text-align:center;padding:64px 32px;}
 .bible-welcome-symbol{display:block;font-size:2.4rem;color:#d9b85f;margin-bottom:20px;}
@@ -125,3 +136,11 @@ body:has(.gospel-page)>.gold-border{height:3px;}
 .scripture-share-page h1{font:400 clamp(1.8rem,4vw,2.7rem)/1.3 Georgia,serif;overflow-wrap:anywhere;}
 .scripture-open-reader{margin-top:26px;}
 @media(max-width:520px){.scripture-share-buttons{gap:8px;}.scripture-share-buttons a{padding:10px 12px;}}
+/* Testament colors retain the parchment reading surface and gold accents. */
+.bible-search-panel[data-testament="new"]{background:#421d29;}
+.bible-library details[data-testament="old"]{background:var(--ministry-navy);}
+.bible-library details[data-testament="new"]{background:#421d29;}
+.bible-library details[data-testament="new"] a:hover{background:#602d3b;}
+.bible-reading-column[data-testament="new"]{--ministry-navy:#421d29;--ministry-navy-hover:#602d3b;}
+.bible-reading-column[data-testament="new"] .bible-recommendation{background:#421d29;}
+.bible-verse[data-testament="new"] .bible-verse-number{color:#793044;}

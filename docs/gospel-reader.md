@@ -54,7 +54,8 @@ was made for this feature. Production preview has no page runtime errors.
 Reference results have WhatsApp, X, Instagram, and a camera icon. The camera is
 an image download, not access to a device camera. It exports only the reference,
 edition, Scripture text, and ministry credit in parchment/gold styling. It does
-not capture menus, controls, personal highlights, or any visitor information.
+not capture menus or controls. Downloaded photos include visible session highlights;
+these are rendered locally in the browser, never sent to the image endpoint.
 
 WhatsApp and X share an absolute production URL at `/gospel/share?lang=...&q=...`.
 This public server-rendered page preserves the full passage and explicitly selects
@@ -66,7 +67,10 @@ the language cookie and opens the same reference. Share pages are noindex.
 new packages or credentials. Only validated local Bible passages are accepted;
 arbitrary text, remote URLs, keyword searches and invalid languages are rejected.
 Image URLs include an edition marker so older translation images are not reused.
-Preview images are 1200×630; downloads are 1080 pixels wide with a bounded height.
+Public preview images stay 1200×630; camera and Instagram downloads are 1080×1920
+(9:16) on desktop and mobile, with the ministry logo and www.hakadoshministry.com.
+The browser renders text and marked ranges with Canvas; the no-JavaScript fallback
+uses the server portrait route without personal highlights.
 Long passages use readable, explicitly labelled excerpts, while shared links keep
 the full passage. No AI-generated or paraphrased Scripture text is used.
 
