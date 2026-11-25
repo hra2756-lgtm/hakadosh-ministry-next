@@ -47,7 +47,8 @@
       const url = new URL(source.url, location.origin)
       const internal = url.origin === location.origin && /^\/(?:$|gospel(?:\/open)?(?:\?|$)|blog(?:\/|$)|contact(?:\?|$))/.test(url.pathname + url.search)
       const external = url.protocol === 'https:' && ['www.youtube.com', 'www.instagram.com', 'x.com'].includes(url.hostname)
-      if (!internal && !external) return element('span', source.title)
+      const email = url.href === 'mailto:hriver2756@hakadoshministry.com'
+      if (!internal && !external && !email) return element('span', source.title)
       node.href = url.href
       if (external) { node.target = '_blank'; node.rel = 'noopener noreferrer' }
     } catch { return element('span', source.title) }

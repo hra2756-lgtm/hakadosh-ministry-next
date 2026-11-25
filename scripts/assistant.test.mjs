@@ -31,6 +31,12 @@ test('rejects invented sources, unsupported Bible references, HTML and model URL
 })
 
 import { assistantConnection, assistantOrigin, assistantRate } from '../src/lib/assistant-production.mjs'
+test('email handoffs always include the fixed ministry mail link', () => {
+  for (const lang of ['en', 'es']) {
+    const result = formatAnswer({ answer: 'Email hriver2756@hakadoshministry.com', sourceIds: [], quoteIds: [] }, ministrySources(lang))
+    assert.equal(result.sources[0].url, 'mailto:hriver2756@hakadoshministry.com')
+  }
+})
 test('production requires explicit enablement and server credentials; previews stay disabled', () => {
  const env = { VERCEL:'1', VERCEL_ENV:'production', ASSISTANT_ENABLED:'true', ASSISTANT_SHARED_SECRET:'a'.repeat(64), ASSISTANT_ACCESS_CLIENT_ID:'test', ASSISTANT_ACCESS_CLIENT_SECRET:'test' }
  assert.equal(assistantEnabled(env), true)

@@ -58,7 +58,7 @@ export function ministrySources(language) {
   const es = language === 'es'
   return [
     { id: 'ministry', kind: 'ministry', title: 'Hakadosh Ministry', url: '/', text: 'Hakadosh Ministry: the place where you can reconcile your relationship with Jesus Christ. Public pages: Home (daily Scripture), Gospel (Bible reader), Blog (Words of Wisdom), YouTube, Music, Store, Connect with Us. Do not infer services, products or features beyond supplied facts.' },
-    { id: 'contact', kind: 'ministry', title: es ? 'Conecta con nosotros' : 'Connect with Us', url: '/contact', text: `Preferred personal contact: ${MINISTRY_EMAIL}. The contact page has a message form. Chat does not send messages. No promised response time.` },
+    { id: 'contact', kind: 'ministry', title: MINISTRY_EMAIL, url: `mailto:${MINISTRY_EMAIL}`, text: `Preferred personal contact: ${MINISTRY_EMAIL}. The contact page has a message form. Chat does not send messages. No promised response time.` },
     { id: 'reader', kind: 'ministry', title: es ? 'Lee la Biblia' : 'Read the Bible', url: '/gospel', text: 'Bible reader: BSB English, BES Spanish; search books, chapters, verses or words; session highlighting and passage sharing. Read full chapters for context.' },
     { id: 'instagram', kind: 'ministry', title: 'Instagram', url: SOCIAL_LINKS.instagram, text: 'Official Instagram: @hakadoshministry.' },
     { id: 'x', kind: 'ministry', title: 'X', url: SOCIAL_LINKS.x, text: 'Official X: @HakadoshMinistr.' },
@@ -83,7 +83,12 @@ export function formatAnswer(data, sources) {
     const rows = searchBible(q).rows
     if (rows.some(r => !sources.some(s => s.id === `bible-${r.key.toLowerCase().replaceAll('.', '-')}`))) throw Error('unsupported_reference')
   }
-  return { answer: data.answer, sources: [...new Set(data.sourceIds)].map(id => {
+  const sourceIds = [...new Set(data.sourceIds)]
+  if (data.answer.includes(MINISTRY_EMAIL) && sources.some(s => s.id === 'contact') && !sourceIds.includes('contact')) {
+    if (sourceIds.length === 4) sourceIds.pop()
+    sourceIds.push('contact')
+  }
+  return { answer: data.answer, sources: sourceIds.map(id => {
     const s = sources.find(item => item.id === id); return { title: s.title, url: s.url }
   }), quotations: [...new Set(data.quoteIds)].map(id => {
     const s = sources.find(item => item.id === id); return { title: s.title, url: s.url, text: s.text }
