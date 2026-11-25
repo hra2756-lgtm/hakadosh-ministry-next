@@ -1,8 +1,11 @@
 import './globals.css'
+import './chat.css'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getLanguage } from '../lib/language'
 import { NavigationIcon } from './components/navigation-icon'
+import { MinistryChat } from './components/ministry-chat'
+import { assistantEnabled } from '../lib/assistant-data.mjs'
 
 export async function generateMetadata() {
   const { text } = await getLanguage()
@@ -67,6 +70,7 @@ export default async function RootLayout({ children }) {
         <main className="page-content">
           {children}
         </main>
+        {assistantEnabled() && <MinistryChat language={language} />}
       </body>
     </html>
   )

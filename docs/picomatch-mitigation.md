@@ -86,3 +86,7 @@ still has the compatibility and maintenance limitations described above.
 Validate the policy with `npm run test:security-audit` from the repository root.
 The tests cover other advisories, changed advisory details, missing protection,
 expiry, malformed/incomplete reports, cycles, and failed fresh audits.
+
+## November 25 review
+GHSA-fc5q-39xc-vjpf was withdrawn by GitHub as not a security issue. The exception is retired, not extended. Fresh audits reject every moderate-or-higher finding, including picomatch. Existing patch verification and compatibility checks remain as defense in depth.
+Source: https://github.com/advisories/GHSA-fc5q-39xc-vjpf
