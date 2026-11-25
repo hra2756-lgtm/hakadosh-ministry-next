@@ -29,8 +29,11 @@ jobs:
       - name: Verify picomatch mitigation
         run: npm run test:security-patch
 
-      - name: Validate guarded audit decisions
+      - name: Validate strict audit decisions
         run: npm run test:security-audit
+
+      - name: Validate assistant protections
+        run: node --test scripts/assistant.test.mjs
 
       - name: Run lint
         run: npm run lint
@@ -47,7 +50,7 @@ jobs:
       - name: Validate Bible data and search
         run: npm run test:bible
 
-      - name: Audit dependencies with verified temporary mitigation
+      - name: Audit dependencies with no advisory exceptions
         run: npm run security:audit
 
   studio:
@@ -68,6 +71,6 @@ jobs:
         working-directory: studio
       - run: npm run build
         working-directory: studio
-      - name: Audit Studio dependencies with verified temporary mitigation
+      - name: Audit Studio dependencies with no advisory exceptions
         run: npm run security:audit
         working-directory: studio
