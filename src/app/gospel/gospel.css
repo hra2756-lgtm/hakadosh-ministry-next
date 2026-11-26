@@ -144,3 +144,31 @@ body:has(.gospel-page)>.gold-border{height:3px;}
 .bible-reading-column[data-testament="new"]{--ministry-navy:#421d29;--ministry-navy-hover:#602d3b;}
 .bible-reading-column[data-testament="new"] .bible-recommendation{background:#421d29;}
 .bible-verse[data-testament="new"] .bible-verse-number{color:#793044;}
+/* Selection palette and readable passage references. */
+.bible-reading-top{grid-template-columns:1fr;gap:12px;}
+.bible-reading-top .bible-highlight-tools{text-align:left;}
+.bible-highlight-popup[hidden]{display:none!important;}
+.bible-reading-top .bible-highlight-popup{position:fixed;z-index:1000;display:flex;gap:2px;padding:6px;background:#fffdf5;border:1px solid #a48c50;border-radius:14px;box-shadow:0 6px 24px #0005;}
+.bible-highlight-tools .bible-highlight-popup button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:8px;margin:0;border:0;border-radius:50%;background:transparent;color:#263348;}
+.bible-highlight-tools .bible-highlight-popup button:hover{background:#eae5d8;}
+.bible-highlight-popup button span{display:block;width:25px;height:25px;border-radius:50%;border:1px solid #0003;background:var(--highlight-color);}
+[data-highlight-color="yellow"]{--highlight-color:#eed77e;}
+[data-highlight-color="pink"]{--highlight-color:#efb0c8;}
+[data-highlight-color="blue"]{--highlight-color:#a9c9f3;}
+[data-highlight-color="green"]{--highlight-color:#b9d59b;}
+.bible-verse mark{background:var(--highlight-color,#eed77e);color:#29251d;cursor:pointer;}
+.bible-passages ::selection{background:#5367b9;color:white;}
+.bible-verse-labelled .bible-verse-number{display:block;font:400 clamp(1.55rem,3vw,2rem)/1.3 Georgia,serif;margin:10px 0 16px;text-decoration:none;}
+.bible-verse-labelled{padding:18px 0 24px;}
+.bible-verse[data-testament="old"] .bible-verse-number,.bible-reading-column[data-testament="old"] .bible-chapter-heading h3{color:#27466a;}
+.bible-verse[data-testament="new"] .bible-verse-number,.bible-reading-column[data-testament="new"] .bible-chapter-heading h3{color:#793044;}
+/* A single reference heading per passage, with inline superscript verse numbers. */
+.bible-passage-group+.bible-passage-group{margin-top:36px;}
+.bible-passage-title{font:400 clamp(1.7rem,3vw,2.2rem)/1.3 Georgia,serif;margin:0 0 20px;}
+.bible-passage-group[data-testament="old"] .bible-passage-title{color:#27466a;}
+.bible-passage-group[data-testament="new"] .bible-passage-title{color:#793044;}
+.bible-passage-flow .bible-verse{display:block;padding:0;margin:0 0 1.1em;}
+.bible-passage-flow .bible-verse:last-child{margin-bottom:0;}
+.bible-passage-flow sup{font-size:.65em;line-height:0;vertical-align:super;}
+.bible-passage-flow .bible-verse-number{font:600 1em Arial,sans-serif;margin:0;text-decoration:none;}
+.bible-passage-flow p{display:inline;}

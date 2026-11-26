@@ -12,48 +12,82 @@
     ctx.beginPath(); ctx.roundRect(24, 24, 1032, 1872, 64)
     ctx.fillStyle = '#f4eedf'; ctx.fill()
     ctx.strokeStyle = '#a48c50'; ctx.lineWidth = 4; ctx.stroke()
-    ctx.fillStyle = '#29251d'; ctx.textBaseline = 'top'
-    ctx.font = '48px Georgia'
-    const title = panel.querySelector('.bible-chapter-heading h3, .bible-chapter-heading h1')?.textContent || tools.dataset.title
-    let y = 76, line = ''
-    for (const word of title.split(/\s+/)) {
-      if (ctx.measureText(`${line} ${word}`).width > 936 && line) { ctx.fillText(line, 72, y); y += 60; line = '' }
-      line += `${line ? ' ' : ''}${word}`
-      if (y > 196) break
-    }
-    ctx.fillText(line, 72, y); y += 76
-    ctx.font = '25px Arial'; ctx.fillStyle = '#625845'
-    ctx.fillText(panel.querySelector('.bible-chapter-heading > p')?.textContent || tools.dataset.title, 72, y, 936)
-    y += 54; ctx.fillStyle = '#a48c50'; ctx.fillRect(72, y, 936, 2); y += 46
-    ctx.font = '40px Georgia'
-    let excerpt = false
-    outer: for (const verse of verses) {
-      const p = verse.querySelector('p')
-      if (!p) continue
-      const number = verse.querySelector('.bible-verse-number, span')?.textContent || ''
-      const chars = [...`${number}  `].map(char => ({ char, marked: false }))
-      const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT)
-      while (walker.nextNode()) for (const char of walker.currentNode.textContent) chars.push({ char, marked: !!walker.currentNode.parentElement.closest('mark') })
-      let x = 72
-      for (let i = 0; i < chars.length; i++) {
-        // Wrap whole words where possible, retaining per-character highlight ranges.
-        if (i === 0 || /\s/.test(chars[i - 1].char)) {
-          let word = '', j = i
-          while (j < chars.length && !/\s/.test(chars[j].char)) word += chars[j++].char
-          if (x > 72 && x + ctx.measureText(word).width > 1008) { x = 72; y += 58 }
-        }
-        const { char, marked } = chars[i], width = ctx.measureText(char).width
-        if (x + width > 1008) { x = 72; y += 58 }
-        if (y > 1590) { excerpt = true; break outer }
-        if (x === 72 && /\s/.test(char)) continue
-        if (marked) { ctx.fillStyle = '#e6c76b'; ctx.fillRect(x, y - 2, width + 1, 48) }
-        ctx.fillStyle = '#29251d'; ctx.fillText(char, x, y); x += width
-      }
-      y += 86
-    }
+
+    const palette = {yellow:'#eed77e',pink:'#efb0c8',blue:'#a9c9f3',green:'#b9d59b'}
     const spanish = panel.closest('[lang="es"]') || panel.querySelector('[data-language="es"]')
-    if (excerpt) { ctx.font = '24px Arial'; ctx.fillStyle = '#625845'; ctx.fillText(spanish ? 'Extracto · Lee el pasaje completo en nuestro sitio' : 'Excerpt · Read the full passage on our website', 72, 1660) }
-    ctx.fillStyle = '#a48c50'; ctx.fillRect(72, 1720, 936, 2)
+    const heading = panel.querySelector('.bible-chapter-heading')
+    const title = heading?.querySelector('h3,h1')?.textContent || (spanish ? 'Escrituras' : 'Scriptures')
+    const version = heading?.querySelector('p')?.textContent || tools.dataset.title.match(/\(([^)]+)\)$/)?.[1] || ''
+    const ink = '#29251d'
+    const colorFor = verse => verse.dataset.testament === 'new' ? '#793044' : '#27466a'
+    ctx.textBaseline = 'top'
+    function wrap(chars,size,width=920) {
+      ctx.font = size+'px Georgia'
+      const lines = []; let line = [], used = 0
+      for (let i=0;i<chars.length;i++) {
+        if(chars[i].paragraphBreak){if(line.length)lines.push(line);lines.push([]);line=[];used=0;continue}
+        if (i === 0 || /\s/.test(chars[i-1].char)) {
+          let word='',j=i
+          while(j<chars.length && !/\s/.test(chars[j].char)) word+=chars[j++].char
+          if(used && used+ctx.measureText(word).width>width){lines.push(line);line=[];used=0}
+        }
+        const item=chars[i]
+        ctx.font=(item.sup ? size*.52 : size)+'px Georgia'
+        const w=ctx.measureText(item.char).width
+        ctx.font=size+'px Georgia'
+        if(used+w>width && line.length){lines.push(line);line=[];used=0}
+        if(!line.length && /\s/.test(item.char))continue
+        line.push({...item,width:w});used+=w
+      }
+      if(line.length)lines.push(line)
+      return lines
+    }
+    const plain = text => [...text].map(char=>({char}))
+    let titleSize=116, titleLines=wrap(plain(title),titleSize)
+    while(titleLines.length>2 && titleSize>72){titleSize-=4;titleLines=wrap(plain(title),titleSize)}
+    let y=80
+    ctx.font=titleSize+'px Georgia';ctx.fillStyle=colorFor(verses[0])
+    for(const line of titleLines){ctx.fillText(line.map(c=>c.char).join(''),80,y);y+=titleSize*1.16}
+    y+=20;ctx.font='30px Arial';ctx.fillStyle='#625845';ctx.fillText(version,80,y,920)
+    y+=64;ctx.fillStyle='#a48c50';ctx.fillRect(80,y,920,2);y+=46
+    const top=y,bottom=1600
+    const groups = [...panel.querySelectorAll('[data-passage-title]')]
+    const entries=(groups.length ? groups : verses).map(group=>{
+      const chars=[]
+      const members=groups.length ? [...group.querySelectorAll('.bible-verse')] : [group]
+      for(const verse of members){
+        for(const char of verse.querySelector('.bible-verse-number')?.textContent || '')chars.push({char,sup:true})
+        chars.push({char:' '})
+        const walker=document.createTreeWalker(verse.querySelector('p'),NodeFilter.SHOW_TEXT)
+        while(walker.nextNode())for(const char of walker.currentNode.textContent){const mark=walker.currentNode.parentElement.closest('mark');chars.push({char,color:mark ? palette[mark.dataset.highlightColor] || palette.yellow : null})}
+        if(verse !== members.at(-1))chars.push({char:' ',paragraphBreak:true})
+      }
+      return {chars,reference:group.dataset.passageTitle || '',color:colorFor(group)}
+    })
+    function layout(size){return entries.map(entry=>({...entry,lines:wrap(entry.chars,size),refLines:!heading && entry.reference ? wrap(plain(entry.reference),size+10):[]}))}
+    const height=(rows,size)=>rows.reduce((sum,e)=>sum+e.refLines.length*(size+10)*1.2+e.lines.reduce((h,line)=>h+size*(line.length ? 1.42 : .65),0)+size*.65,0)
+    let size=104, rows=layout(size)
+    while(size>60 && height(rows,size)>bottom-top){size-=2;rows=layout(size)}
+    const excerpt=height(rows,size)>bottom-top
+    if(!excerpt)y+=Math.max(0,(bottom-top-height(rows,size))/2)
+    let cropped=false
+    outer:for(const entry of rows){
+      if(y+entry.refLines.length*(size+10)*1.2+size*1.42>bottom){cropped=true;break}
+      ctx.font=(size+10)+'px Georgia';ctx.fillStyle=entry.color
+      for(const line of entry.refLines){if(y+(size+10)*1.2>bottom){cropped=true;break outer}ctx.fillText(line.map(c=>c.char).join(''),80,y);y+=(size+10)*1.2}
+      ctx.font=size+'px Georgia'
+      for(const line of entry.lines){
+        if(!line.length){y+=size*.65;continue}
+        if(y+size*1.42>bottom){cropped=true;break outer}
+        let x=80
+        for(const item of line){if(item.color){ctx.fillStyle=item.color;ctx.fillRect(x,y+4,item.width+1,size*1.08)}ctx.fillStyle=ink;ctx.font=(item.sup ? size*.52 : size)+'px Georgia';ctx.fillText(item.char,x,y+(item.sup ? 0 : size*.12));x+=item.width}
+        y+=size*1.42
+      }
+      y+=size*.65
+    }
+    if(cropped){ctx.font='48px Georgia';ctx.fillStyle=ink;ctx.fillText('…',80,1605)}
+    if(cropped){ctx.font='26px Arial';ctx.fillStyle='#625845';ctx.fillText(spanish ? 'Extracto · Lee el pasaje completo en nuestro sitio' : 'Excerpt · Read the full passage on our website',80,1670,920)}
+    ctx.fillStyle='#a48c50';ctx.fillRect(80,1720,920,2)
     const logo = new Image(); logo.src = '/favicon.png'; await logo.decode()
     ctx.drawImage(logo, 492, 1740, 96, 96)
     ctx.font = '28px Arial'; ctx.fillStyle = '#29251d'; ctx.textAlign = 'center'
