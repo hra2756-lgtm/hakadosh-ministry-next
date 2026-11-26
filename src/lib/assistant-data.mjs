@@ -1,3 +1,4 @@
+import { rankedBibleReferences } from './assistant-bible-search.mjs'
 import { normalize, parseReferences, searchBible } from './bible.mjs'
 import { findScriptureLinks } from './scripture-links.mjs'
 import { MINISTRY_EMAIL, SOCIAL_LINKS } from './contact-config.mjs'
@@ -31,6 +32,8 @@ export function relevantExcerpt(text, words) {
 }
 
 const themes = [
+  [/miracle|milagro|signs|wonders|dones|gifts|prodigio/, 'JHN 14:12; 1CO 12:7,11; 1CO 13:1-3'],
+  [/glory|gloria/, 'ISA 42:8; 1PE 4:10-11'],
   [/\b(faith|fe|believ\w*|creer)\b/, 'HEB 11:1; ROM 10:17'],
   [/\b(pray\w*|oracion|orar)\b/, 'MAT 6:9-13; PHP 4:6-7'],
   [/\b(salvation|saved|salvacion|salvo|salvar)\b/, 'EPH 2:8-10; ROM 10:9-10'],
@@ -46,7 +49,7 @@ const themes = [
 export function bibleSources(message, language) {
   const explicit = findScriptureLinks(message, language).map(link => new URL(link.href, 'https://local.invalid').searchParams.get('q'))
   const queries = explicit.length ? explicit.slice(0, 3) : themes.filter(([pattern]) => pattern.test(normalize(message))).slice(0, 2).map(([, q]) => q)
-  if (!queries.length) queries.push(...terms(message).slice(0, 2))
+  if (!queries.length) queries.push(...rankedBibleReferences(message, language))
   const seen = new Set(), sources = []
   for (const query of queries) {
     const result = searchBible(query, language)
