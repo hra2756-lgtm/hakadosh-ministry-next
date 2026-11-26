@@ -16,7 +16,7 @@ and an Access Service Auth policy scoped to the Vercel service token.
 The server allows only the two ministry production origins, validates payloads,
 and uses Redis for five requests/minute per keyed network hash with a 60-second
 expiry. Raw IPs and chats are not stored. Missing rate storage or trusted Vercel
-IP fails closed. The Worker also enforces its aggregate daily/minute budget.
+IP fails closed. The Worker also enforces its shared per-minute limit.
 This reduces abuse but is not proof of a human visitor. Monitor quota exhaustion.
 Disable ASSISTANT_ENABLED and redeploy to hide the chat and close its API.
 
@@ -63,10 +63,7 @@ processes content and may keep technical metadata under its own terms.
 Next's local route enforces same-origin JSON requests, bounded streaming bodies,
 one in-flight request, and five requests/minute (process-wide, not per-person).
 The Worker requires a server-only random bearer secret. Its Durable Object stores
-only a single aggregate usage record: UTC day, minute, count and conservative
-neuron reservation. It caps 20 calls/minute and 9,000 estimated neurons/day. This
-is **not** an exact account-wide meter: other apps use the same free allocation,
-and local counters are separate from any deployed counters. No paid plan is enabled.
+only a shared minute/count record with a 20 calls/minute cap. The estimated daily neuron cutoff has been removed; Cloudflare enforces its actual account allowance. Quota errors use usage_limit, short-term rate/concurrency errors use rate_limit/busy, and other failures remain unavailable. No billing settings or plans are changed.
 
 ## Checks
 

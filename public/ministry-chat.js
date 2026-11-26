@@ -73,7 +73,7 @@
       const response = await fetch('/api/assistant', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: next, language: es ? 'es' : 'en' }), signal: abort.signal, cache: 'no-store' })
       const data = await response.json()
-      if (!response.ok) throw Error(data.error === 'limit' ? 'limit' : 'unavailable')
+      if (!response.ok) throw Error(['usage_limit', 'rate_limit', 'busy'].includes(data.error) ? data.error : 'unavailable')
       if (abort.signal.aborted) return
       const article = bubble('assistant', data.answer)
       for (const source of data.quotations || []) {
@@ -89,8 +89,10 @@
       status.textContent = ''
     } catch (error) {
       if (abort.signal.aborted) return
-      const message = error.message === 'limit'
+      const message = error.message === 'usage_limit'
         ? (es ? 'Hemos alcanzado un límite temporal. Intenta más tarde o escribe al ministerio.' : 'We’ve reached a temporary usage limit. Please try later or email the ministry.')
+        : ['rate_limit', 'busy'].includes(error.message)
+          ? (es ? 'El asistente está ocupado o has enviado varias preguntas seguidas. Espera un minuto e inténtalo de nuevo.' : 'The assistant is busy or you’ve sent several questions quickly. Please wait a minute and try again.')
         : (es ? 'No puedo conectarme al asistente en este momento. Inténtalo de nuevo más tarde.\n\nTambién puedes escribir al ministerio.' : 'I can’t connect to the assistant right now. Please try again later.\n\nYou can also email the ministry.')
       const article = bubble('assistant', message)
       const links = element('div', '', 'chat-sources')
