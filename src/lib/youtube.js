@@ -1,6 +1,6 @@
 import 'server-only'
 import { unstable_cache } from 'next/cache'
-import { fetchPlaylistVideos, fetchChannelStatistics } from './youtube-data.mjs'
+import { fetchPlaylistVideos, fetchChannelStatistics, fetchChannelVideos } from './youtube-data.mjs'
 
 // Only sanitized public results are cached. Neither the secret nor request
 // headers are cache arguments or stored fetch responses.
@@ -13,6 +13,19 @@ const cachedChannel = unstable_cache(async channelId => ({
   statistics: await fetchChannelStatistics({ channelId, apiKey: process.env.YOUTUBE_API_KEY }),
   fetchedAt: Date.now(),
 }), ['hakadosh-youtube-channel-v1'], { revalidate: 3600 })
+
+const cachedUploads = unstable_cache(async channelId => ({
+  videos: await fetchChannelVideos({channelId, apiKey: process.env.YOUTUBE_API_KEY}),
+  fetchedAt: Date.now(),
+}), ['hakadosh-assistant-uploads-v1'], { revalidate: 3600 })
+
+export async function getChannelVideos(channelId) {
+  try {
+    const result = await cachedUploads(channelId)
+    if (Date.now() - result.fetchedAt > 86400000) throw Error('expired')
+    return { videos: result.videos, unavailable: false }
+  } catch { return { videos: [], unavailable: true } }
+}
 
 export async function getChannelStatistics(channelId) {
   try {

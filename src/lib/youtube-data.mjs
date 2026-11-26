@@ -90,6 +90,16 @@ export async function fetchPlaylistVideos({ playlistId, channelId, apiKey, fetch
   return videos.sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt) || a.id.localeCompare(b.id))
 }
 
+// Use each channel's complete uploads collection for assistant title search,
+// including public videos outside the website's curated playlists.
+export async function fetchChannelVideos({ channelId, apiKey, fetchImpl = fetch }) {
+  const request = youtubeRequest(apiKey, fetchImpl)
+  const data = await request('channels', { part: 'contentDetails', id: channelId })
+  const playlistId = data.items?.find(item => item.id === channelId)?.contentDetails?.relatedPlaylists?.uploads
+  if (typeof playlistId !== 'string' || !/^[A-Za-z0-9_-]+$/.test(playlistId)) throw new Error('YOUTUBE_INVALID_RESPONSE')
+  return fetchPlaylistVideos({playlistId, channelId, apiKey, fetchImpl})
+}
+
 export function visibleCount(value, total) {
   const parsed = typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : 6
   return Math.min(total, Math.max(6, Number.isSafeInteger(parsed) ? parsed : 6))

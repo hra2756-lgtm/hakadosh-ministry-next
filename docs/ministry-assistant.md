@@ -45,7 +45,7 @@ The UI constructs exact quotation cards and links from those sources rather than
 trusting model-generated Bible text or URLs. Unsupported references/IDs fail closed.
 
 `assistant-knowledge.js` reads published posts from the same dataset as the local
-blog (latest 200, matching excerpts), and public video/Short titles from existing
+blog (all published posts, paginated; both languages, matching passages), and public video/Short titles from both channels complete upload collections using
 cached YouTube APIs. No Sanity read token, drafts or internal files are sent.
 There are no video transcripts or external-teacher texts yet. The agent must not
 invent their contents. Source text and prior messages are untrusted data.
@@ -73,3 +73,6 @@ and local counters are separate from any deployed counters. No paid plan is enab
 Website: `node --test scripts/assistant.test.mjs`, `npm.cmd run lint`, `npm.cmd run build`.
 Agent: `node --test test/protocol.test.mjs`, `npx.cmd tsc --noEmit`.
 
+
+## Public library retrieval
+All published posts are paginated in batches of 100; both translations are searched across their full text. Relevant passages only are sent to the model within existing source-size limits. Exact titles and latest-post intent guide selection. Scripture context also comes from references in the selected post passages. Channel uploads include public videos outside curated playlists. Sanity reads refresh after 60 seconds; channel title caches refresh after one hour. No drafts, tokens for private Sanity access, video transcripts, or write permissions are introduced. Partial upstream failures are reported to the model, never treated as proof that content does not exist.

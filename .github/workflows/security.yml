@@ -33,7 +33,7 @@ jobs:
         run: npm run test:security-audit
 
       - name: Validate assistant protections
-        run: node --test scripts/assistant.test.mjs
+        run: node --test scripts/assistant.test.mjs scripts/assistant-content.test.mjs
 
       - name: Run lint
         run: npm run lint
