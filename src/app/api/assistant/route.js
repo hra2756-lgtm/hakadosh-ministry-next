@@ -1,4 +1,4 @@
-import { assistantEnabled, validateChat, formatAnswer } from '../../../lib/assistant-data.mjs'
+import { assistantEnabled, validateChat, formatAnswer, uncertainAnswer } from '../../../lib/assistant-data.mjs'
 import { assistantKnowledge } from '../../../lib/assistant-knowledge'
 import { assistantConnection, assistantOrigin, assistantRate } from '../../../lib/assistant-production.mjs'
 
@@ -42,9 +42,15 @@ export async function POST(request) {
     if (!response.ok) {
       const failure = await response.json().catch(() => ({}))
       console.warn('[assistant] upstream unavailable', response.status, ['validation', 'budget', 'provider', 'answer'].includes(failure.stage) ? failure.stage : 'connection', ['invalid_json', 'missing_text', 'missing_answer', 'long_answer', 'unsafe_answer', 'invalid_sources'].includes(failure.reason) ? failure.reason : '')
+      if (failure.stage === 'answer' && ['invalid_json', 'missing_text', 'missing_answer', 'long_answer', 'unsafe_answer', 'invalid_sources'].includes(failure.reason)) return reply(uncertainAnswer(chat.language))
       return reply({ error: response.status === 429 ? 'limit' : 'unavailable' }, response.status === 429 ? 429 : 503)
     }
-    return reply(formatAnswer(await response.json(), sources))
+    const data = await response.json()
+    try { return reply(formatAnswer(data, sources)) }
+    catch {
+      console.warn('[assistant] answer could not be verified')
+      return reply(uncertainAnswer(chat.language))
+    }
   } catch (error) {
     console.warn('[assistant] request failed', ['TimeoutError', 'AbortError'].includes(error?.name) ? error.name : 'validation-or-connection')
     return reply({ error: 'unavailable' }, 503)

@@ -50,3 +50,13 @@ test('production requires explicit enablement and server credentials; previews s
 test('production rate limiting fails closed when trusted client IP or storage is absent', async () => {
  await assert.rejects(assistantRate(new Request('https://www.hakadoshministry.com'),{}), /rate-unavailable/)
 })
+
+import { uncertainAnswer } from '../src/lib/assistant-data.mjs'
+test('unverifiable responses fall back to honest localized text without fabricated citations', () => {
+  for (const lang of ['en', 'es']) {
+    const result = uncertainAnswer(lang)
+    assert.ok(result.answer.includes(lang === 'es' ? 'No tengo suficiente' : "I don't have enough"))
+    assert.deepEqual(result.quotations, [])
+    assert.equal(result.sources[0].url, 'mailto:hriver2756@hakadoshministry.com')
+  }
+})

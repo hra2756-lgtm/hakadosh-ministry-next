@@ -89,9 +89,13 @@
       status.textContent = ''
     } catch (error) {
       if (abort.signal.aborted) return
-      status.textContent = error.message === 'limit'
+      const message = error.message === 'limit'
         ? (es ? 'Hemos alcanzado un límite temporal. Intenta más tarde o escribe al ministerio.' : 'We’ve reached a temporary usage limit. Please try later or email the ministry.')
-        : (es ? 'No puedo responder de forma fiable ahora. Puedes leer la Biblia o escribir al ministerio.' : 'I can’t provide a reliable answer right now. You can read the Bible or email the ministry.')
+        : (es ? 'No puedo conectarme al asistente en este momento. Inténtalo de nuevo más tarde.\n\nTambién puedes escribir al ministerio.' : 'I can’t connect to the assistant right now. Please try again later.\n\nYou can also email the ministry.')
+      const article = bubble('assistant', message)
+      const links = element('div', '', 'chat-sources')
+      links.append(link({ title: 'hriver2756@hakadoshministry.com', url: 'mailto:hriver2756@hakadoshministry.com' }))
+      article.append(links); status.textContent = ''
       // Failed turns do not enter the model's conversation history.
     } finally {
       if (controller === abort) { pending = false; send.disabled = false; controller = null; moveDown(); input.focus() }
