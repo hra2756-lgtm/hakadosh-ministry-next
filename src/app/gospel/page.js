@@ -29,6 +29,25 @@ export default async function GospelPage({ searchParams }) {
   }
   const verseLabel = singleChapter && result.rows.length !== selectedBook.chapters[selectedChapter - 1].length
     ? ranges.map(([start, end]) => start === end ? start : `${start}–${end}`).join(', ') : ''
+
+  const passageGroups = []
+  for (const verse of result.rows) {
+    let group = passageGroups.at(-1)
+    if (!group || group.book !== verse.book || group.chapter !== verse.chapter) {
+      group = { book: verse.book, chapter: verse.chapter, rows: [] }
+      passageGroups.push(group)
+    }
+    group.rows.push(verse)
+  }
+  for (const group of passageGroups) {
+    const spans = []
+    for (const verse of group.rows) {
+      const last = spans.at(-1)
+      if (last && last[1] + 1 === verse.start) last[1] = verse.end
+      else spans.push([verse.start, verse.end])
+    }
+    group.title = reference(findBook(group.book, language), group.chapter, spans.map(([a,b]) => a === b ? a : a + '–' + b).join(', '))
+  }
   const pageHref = page => `/gospel?${new URLSearchParams({ q: result.query, page: String(page) })}`
 
   return <div className="gospel-page">
@@ -83,15 +102,21 @@ export default async function GospelPage({ searchParams }) {
               <details><summary>{t.chapters}</summary><nav className="bible-chapter-grid" aria-label={t.chapters}>{selectedBook.chapters.map((_, i) => <a key={i} href={chapterHref(selectedBook.id, i + 1)} aria-current={selectedChapter === i + 1 ? 'page' : undefined}>{i + 1}</a>)}</nav></details>
             </header>}
             <div className="bible-highlight-tools" data-highlight-tools hidden data-select-first={t.selectFirst} data-saved={t.saved} data-cleared={t.cleared} data-storage={t.storage} data-limit={t.limit}>
-              <div><button type="button" data-highlight-add>{t.highlight} <span aria-hidden="true">✎</span></button><button type="button" data-highlight-clear>{t.clear}</button></div>
+              <div className="bible-highlight-popup" data-highlight-popup hidden role="toolbar" aria-label={t.highlight}>
+                {['yellow', 'pink', 'blue', 'green'].map((color, i) => <button key={color} type="button" data-highlight-color={color} aria-label={t.highlightColors[i]} title={t.highlightColors[i]}><span aria-hidden="true" /></button>)}
+                <button type="button" data-highlight-erase aria-label={t.eraseSelection} title={t.eraseSelection}><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></svg></button>
+              </div>
               <p>{t.highlightHelp}</p><p data-highlight-status role="status" aria-live="polite" />
             </div>
             </div>
             <div className="bible-passages" data-bible-passages data-language={language}>
-              {result.rows.map(verse => <article key={verse.key} data-testament={isNewTestament(verse.book) ? 'new' : 'old'} className="bible-verse" id={`verse-${verse.key}`}>
-                <a className="bible-verse-number" href={`${chapterHref(verse.book, verse.chapter)}#verse-${verse.key}`} aria-label={verse.reference}>{singleChapter ? verse.verse : verse.reference}</a>
-                <p data-verse-text={verse.key}>{verse.text}</p>
-              </article>)}
+              {passageGroups.map((group, index) => <section key={index} className="bible-passage-group" data-passage-title={group.title} data-testament={isNewTestament(group.book) ? 'new' : 'old'}>
+                {!singleChapter && <h3 className="bible-passage-title">{group.title}</h3>}
+                <div className="bible-passage-flow">{group.rows.map(verse => <article key={verse.key} data-testament={isNewTestament(verse.book) ? 'new' : 'old'} data-reference={verse.reference} className="bible-verse" id={'verse-' + verse.key}>
+                  <sup><a className="bible-verse-number" href={chapterHref(verse.book, verse.chapter) + '#verse-' + verse.key} aria-label={verse.reference}>{verse.verse}</a></sup>{' '}
+                  <p data-verse-text={verse.key}>{verse.text}</p>{' '}
+                </article>)}</div>
+              </section>)}
             </div>
             {(singleChapter || share) && <div className="bible-reading-footer">
               {singleChapter && selectedChapter > 1 ? <a href={chapterHref(selectedBook.id, selectedChapter - 1)}>← {t.previousChapter}</a> : <span />}
