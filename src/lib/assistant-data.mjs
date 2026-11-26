@@ -3,6 +3,14 @@ import { findScriptureLinks } from './scripture-links.mjs'
 import { MINISTRY_EMAIL, SOCIAL_LINKS } from './contact-config.mjs'
 
 export const assistantEnabled = (env = process.env) => env.ASSISTANT_ENABLED === 'true' && ((!env.VERCEL && env.NODE_ENV === 'development') || (env.VERCEL === '1' && env.VERCEL_ENV === 'production'))
+export function uncertainAnswer(language) {
+  return {
+    answer: language === 'es'
+      ? `No tengo suficiente información verificada para responder esa pregunta con confianza.\n\nPuedes reformularla o escribir al ministerio: ${MINISTRY_EMAIL}.`
+      : `I don't have enough verified information to answer that question reliably.\n\nYou can rephrase it or email the ministry: ${MINISTRY_EMAIL}.`,
+    sources: [{ title: MINISTRY_EMAIL, url: `mailto:${MINISTRY_EMAIL}` }], quotations: [],
+  }
+}
 export function validateChat(body) {
   if (!body || !['en', 'es'].includes(body.language) || !Array.isArray(body.messages) ||
       body.messages.length < 1 || body.messages.length > 7 || body.messages.length % 2 !== 1) throw Error('invalid')
